@@ -133,7 +133,7 @@ class Plugin_Container {
 			$class_name2 = $class_names[2];
 			$class_name2 = str_replace( '_', '-', $class_name2 );
 			$class_name3 = strtolower( $class_name2 );
-			$filename    = plugin_dir_path( self::$plugin_base_file_path ) . 'vendor/centralplugin/wp-plugin-framework/src/WP_PluginFramework/' . $namespace . '/class-' . str_replace( '\\', '/', $class_name3 ) . '.php';
+			$filename    = plugin_dir_path( self::$plugin_base_file_path ) . 'vendor/wppluginframework/wp-plugin-framework/src/WP_PluginFramework/' . $namespace . '/class-' . str_replace( '\\', '/', $class_name3 ) . '.php';
 			if ( file_exists( $filename ) ) {
 				include $filename;
 				if ( class_exists( $class_name ) ) {
