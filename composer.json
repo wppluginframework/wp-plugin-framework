@@ -29,6 +29,6 @@
     ]
   },
   "autoload": {
-    "psr-4": {"WP_PluginFramework": "src/"}
+    "psr-4": {"WP_PluginFramework\\": "src/"}
   }
 }
