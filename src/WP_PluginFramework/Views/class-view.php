@@ -75,8 +75,7 @@ abstract class View extends Html_Base_Element {
 			$component->set_controllerid( $this->id );
 			$component->set_parent_view( $this );
 
-			if ( ! isset( $this->$id ) ) {
-				$this->$id                   = $component;
+			if ( ! isset( $this->all_components[ $id ] ) ) {
 				$this->all_components[ $id ] = $component;
 			} else {
 				Debug_Logger::write_debug_error( 'Duplicate component Id ' . $id );
