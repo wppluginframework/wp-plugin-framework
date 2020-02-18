@@ -49,7 +49,7 @@ class Admin_Std_View extends Std_View {
 	 * @param $id
 	 * @param $component
 	 */
-	protected function add_component( $id, $component ) {
+	protected function register_component( $id, $component ) {
 		if ( is_object( $component ) ) {
 			$class            = get_class( $component );
 			$plugin_container = Plugin_Container::instance();
@@ -61,6 +61,6 @@ class Admin_Std_View extends Std_View {
 			}
 		}
 
-		parent::add_component( $id, $component );
+		parent::register_component( $id, $component );
 	}
 }

@@ -69,14 +69,14 @@ abstract class View extends Html_Base_Element {
 	 * @param $id
 	 * @param $component Html_Base_Component
 	 */
-	protected function add_component( $id, $component ) {
+	protected function register_component( $id, $component ) {
 		if ( isset( $id ) && is_object( $component ) ) {
 			$component->set_id( $id );
 			$component->set_controllerid( $this->id );
 			$component->set_parent_view( $this );
 
-			if ( ! isset( $this->all_components[ $id ] ) ) {
-				$this->all_components[ $id ] = $component;
+			if ( ! isset( $this->components[ $id ] ) ) {
+				$this->components[ $id ] = $component;
 			} else {
 				Debug_Logger::write_debug_error( 'Duplicate component Id ' . $id );
 			}

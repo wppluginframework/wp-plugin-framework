@@ -63,7 +63,7 @@ class Admin_Panel_Std_View extends Admin_Std_View {
 		parent::__construct( $id, $controller );
 
 		$this->admin_status_bar = new Status_Bar( Status_Bar::TYPE_REMOVABLE_BLOCK );
-		$this->add_component( 'admin_status_bar', $this->admin_status_bar );
+		$this->register_component( 'admin_status_bar', $this->admin_status_bar );
 
 		$this->div_wrapper = array( 'class' => 'wpf-admin-area-cell' );
 
