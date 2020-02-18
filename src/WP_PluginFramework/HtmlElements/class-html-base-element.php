@@ -259,15 +259,6 @@ abstract class Html_Base_Element extends Base_Object {
 	/**
 	 * Summary.
 	 *
-	 * This function must be overridden by checkbox elements to clear value. When client side send a post method, only
-	 * checked checkboxes will send values. This is needed for checkboxes set checked by default, which is cleared by
-	 * user.
-	 */
-	public function clear_checkbox_before_form_post() {     }
-
-	/**
-	 * Summary.
-	 *
 	 * @param $html
 	 */
 	public function set_html( $html ) {

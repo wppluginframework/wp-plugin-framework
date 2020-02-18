@@ -41,7 +41,7 @@ abstract class View extends Html_Base_Element {
 
 	protected $id             = null;
 	protected $controller     = null;
-	protected $all_components = array();
+	protected $components     = array();
 	protected $call_backs     = array();
 	protected $div_wrapper    = null;
 
@@ -155,7 +155,7 @@ abstract class View extends Html_Base_Element {
 	}
 
 	public function check_event_exist( $event, $event_type, $event_source ) {
-		foreach ( $this->all_components as $component ) {
+		foreach ( $this->components as $component ) {
 			if ( $component->check_event_exist( $event, $event_type, $event_source ) ) {
 				return true;
 			}
@@ -173,7 +173,7 @@ abstract class View extends Html_Base_Element {
 	}
 
 	public function get_ajax_response() {
-		foreach ( $this->all_components as $component ) {
+		foreach ( $this->components as $component ) {
 			if ( isset( $component ) ) {
 				$work_items = $component->get_ajax_response();
 				if ( ! empty( $work_items ) ) {
@@ -185,4 +185,44 @@ abstract class View extends Html_Base_Element {
 		return $this->ajax_response;
 	}
 
+	public function read_client_side_values( $values = array() ) {
+		$client_side_values = array();
+		foreach ( $_POST as $key => $value ) {
+			if ( ( is_string( $key ) ) && ( is_string( $value ) ) ) {
+				if ( ( '_' !== $key[0] ) && ( 'action' !== $key ) ) {
+					/* jQuery ajax post adds double slashes */
+					$client_side_values[ $key ] = stripslashes( $value );
+				}
+			}
+		}
+
+		foreach ( $this->components as $id => $component ) {
+			$value = $component->pick_client_side_value($client_side_values);;
+			if( isset( $value)) {
+				$values[ $id ] = $value;
+			}
+		}
+		return $values;
+	}
+
+	public function set_values( $values ) {
+		if ( isset( $values ) ) {
+			foreach ( $values as $id => $value ) {
+				if( isset($this->components[$id]) ) {
+					$this->components[$id]->set_value($value);
+				}
+			}
+		}
+	}
+
+	public function get_values() {
+		$values = array();
+		foreach ( $this->components as $id => $component ) {
+			$value = $component->get_value();
+			if( isset($value) ) {
+				$values[ $id ] = $component->get_value();
+			}
+		}
+		return $values;
+	}
 }

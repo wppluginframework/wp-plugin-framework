@@ -27,10 +27,16 @@ namespace WP_PluginFramework\Views;
 defined( 'ABSPATH' ) || exit;
 
 use WP_PluginFramework\DataTypes\Data_Type;
+use WP_PluginFramework\HtmlComponents\Html_Base_Component;
+use WP_PluginFramework\HtmlComponents\Input_Component;
 use WP_PluginFramework\HtmlComponents\Push_Button;
 use WP_PluginFramework\HtmlComponents\Status_Bar;
 use WP_PluginFramework\HtmlElements\H;
+use WP_PluginFramework\HtmlElements\Hr;
 use WP_PluginFramework\HtmlElements\P;
+use WP_PluginFramework\HtmlElements\Table;
+use WP_PluginFramework\HtmlElements\Td;
+use WP_PluginFramework\HtmlElements\Tr;
 use WP_PluginFramework\Utils\Debug_Logger;
 
 /**
@@ -40,8 +46,13 @@ use WP_PluginFramework\Utils\Debug_Logger;
  */
 class Std_View extends Form_View {
 
-	protected $headers = null;
-	protected $footers = array();
+	protected $headers              = null;
+	protected $form_inputs          = array();
+	protected $buttons              = array();
+	protected $footers              = array();
+	protected $input_form_categories= array();
+	protected $content_config        = array();
+	protected $form_table_tr_wrapper = null;
 
 	/**
 	 * Construction.
@@ -56,18 +67,58 @@ class Std_View extends Form_View {
 		$this->id      = $id;
 		$this->form_id = $id;
 
-		$this->content_config['form_input_encapsulation'] = 'table';
-		$this->div_wrapper                                = array( 'class' => 'wpf-controller' );
-		$this->content_config['form_input_width']         = '400px';
+		$this->div_wrapper                                  = array( 'class' => 'wpf-controller' );
+		$this->content_config['form_input_encapsulation']   = 'table';
+		$this->content_config['form_input_width']           = '400px';
+		$this->content_config['form_input_layout']          = 'single_column_table';
+		$this->content_config['form_placeholder_table_attr']= array( 'class' => 'wpf-table-placeholder' );
+		$this->content_config['form_placeholder_tr_attr']   = null;
+		$this->content_config['form_placeholder_th_attr']   = array( 'class' => 'wpf-table-placeholder-input' );
+		$this->content_config['form_placeholder_td_attr']   = array( 'class' => 'wpf-table-placeholder-input' );
 	}
 
 	public function add_header( $id, $component ) {
-		$this->add_component( $id, $component );
 		$this->headers[ $id ] = $component;
 	}
 
+	/**
+	 * @param $id
+	 * @param $component Html_Base_Component
+	 */
+	public function add_form_input( $id, $component ) {
+		$this->form_inputs[ $id ] = $component;
+
+		/* If no name is set for a form input, use the id as name*/
+		if ( $this->form_inputs[ $id ]->get_property( 'name' ) === null ) {
+			$this->form_inputs[ $id ]->set_property( 'name', $id );
+		}
+
+		$component->set_form_id( $this->form_id );
+	}
+
+	public function get_form_input_component( $name = null ) {
+		if ( ! isset( $name ) ) {
+			return $this->form_inputs;
+		} else {
+			foreach ( $this->form_inputs as $form_input ) {
+				if ( $name === $form_input->get_property( 'name' ) ) {
+					return $form_input;
+				}
+			}
+		}
+
+		return null;
+	}
+
+	public function add_input_form_category( $category ) {
+		$this->input_form_categories[] = $category;
+	}
+
+	public function add_button( $id, $component ) {
+		$this->buttons[ $id ] = $component;
+	}
+
 	public function add_footer( $id, $component ) {
-		$this->add_component( $id, $component );
 		$this->footers[ $id ] = $component;
 	}
 
@@ -122,6 +173,45 @@ class Std_View extends Form_View {
 		$this->add_footer( 'status_bar_footer', new Status_Bar() );
 	}
 
+	/**
+	 * @param array $inputs string List of component names
+	 */
+	public function show_input_error_indications( $inputs = null ) {
+		if ( isset( $inputs ) ) {
+			foreach ( $inputs as $component_name => $value ) {
+				if ( isset( $this->components[ $component_name ] ) ) {
+					$this->components[ $component_name ]->show_input_error_indication();
+				} else {
+					Debug_Logger::write_debug_error( 'Non-existing Html Component ' . $component_name );
+				}
+			}
+		} else {
+			foreach ( $this->components as $component ) {
+				if($component instanceof Input_Component) {
+					$component->show_input_error_indication();
+				}
+			}
+		}
+	}
+
+	public function hide_input_error_indications( $inputs = null ) {
+		if ( isset( $inputs ) ) {
+			foreach ( $inputs as $component_name => $value ) {
+				if ( isset( $this->components[ $component_name ] ) ) {
+					$this->components[ $component_name ]->hide_input_error_indication();
+				} else {
+					Debug_Logger::write_debug_error( 'Non-existing Html Component ' . $component_name );
+				}
+			}
+		} else {
+			foreach ( $this->components as $component ) {
+				if($component instanceof Input_Component) {
+					$component->hide_input_error_indication();
+				}
+			}
+		}
+	}
+
 	public function create_content( $parameters = null, $wrapper = null ) {
 		if ( ! isset( $wrapper ) ) {
 			$wrapper = $this;
@@ -130,14 +220,109 @@ class Std_View extends Form_View {
 		$wrapper = parent::create_content( $parameters, $wrapper );
 
 		if ( isset( $this->headers ) ) {
-			foreach ( array_reverse( $this->headers ) as $header ) {
+			foreach ( $this->headers as $header ) {
 				if ( is_string( $header ) ) {
 					$header = new H( 1, $header );
-					$wrapper->prepend_content( $header );
+					$wrapper->add_content( $header );
 				} elseif ( is_object( $header ) ) {
-					$wrapper->prepend_content( $header, $this->content_config );
+					$wrapper->add_content( $header, $this->content_config );
 				} else {
 					Debug_Logger::write_debug_error( 'Unhandled component type ' . gettype( $header ) );
+				}
+			}
+		}
+
+		if ( isset( $this->content_config['form_input_encapsulation'] ) && ( $this->content_config['form_input_encapsulation'] ) === 'table' ) {
+			$td_form_attr          = $this->content_config['form_placeholder_td_attr'];
+			$td_form_attr['width'] = $this->content_config['form_input_width'];
+
+			$td_form                     = new Td( null, $td_form_attr );
+			$td_spacing                  = new Td( null, $this->content_config['form_placeholder_td_attr'] );
+			$this->form_table_tr_wrapper = new Tr( $td_form, $this->content_config['form_placeholder_tr_attr'] );
+			$this->form_table_tr_wrapper->add_content( $td_spacing );
+			$table_wrapper = new Table( $this->form_table_tr_wrapper, $this->content_config['form_placeholder_table_attr'] );
+			$wrapper->add_content( $table_wrapper );
+		} else {
+			$td_form = $wrapper;
+		}
+
+		if ( isset( $parameters ) ) {
+			foreach ( $this->form_inputs as $component ) {
+				if ( isset( $component ) ) {
+					if ( isset( $component->name ) ) {
+						$name = $component->name;
+						if ( isset( $parameters[ $name ] ) ) {
+							$component->set_value( $parameters[ $name ] );
+						}
+					}
+				}
+			}
+		}
+
+		if ( empty( $this->input_form_categories ) ) {
+			$table = new Table( null, $this->content_config['form_placeholder_table_attr'] );
+			foreach ( $this->form_inputs as $component ) {
+				if ( isset( $component ) ) {
+					$table->add_content( $component, $this->content_config );
+				}
+			}
+			$td_form->add_content( $table );
+
+			if ( isset( $this->buttons ) ) {
+				$first_button     = true;
+				$button_paragraph = new P( null, array( 'class' => 'wpf-table-placeholder submit' ) );
+				foreach ( $this->buttons as $button ) {
+					if ( isset( $button ) ) {
+						if ( ! $first_button ) {
+							$button_paragraph->add_content( '&nbsp;&nbsp;' );
+						}
+						$first_button = false;
+
+						$button_paragraph->add_content( $button, $this->content_config );
+					}
+				}
+				$td_form->add_content( $button_paragraph );
+			}
+		} else {
+			$first_category = true;
+			foreach ( $this->input_form_categories as $category ) {
+				if ( false === $first_category ) {
+					$divider = new Hr();
+					$td_form->add_content( $divider );
+				}
+				$first_category = false;
+
+				$header = new H( 2, $category['header'] );
+				$td_form->add_content( $header );
+				if ( isset( $category['description'] ) ) {
+					$description = new P( $category['description'] );
+					$td_form->add_content( $description );
+				}
+
+				$table = new Table( null, $this->content_config['form_placeholder_table_attr'] );
+				foreach ( $this->form_inputs as $component ) {
+					if ( isset( $component ) ) {
+						if ( isset( $component->category ) && ( $component->category === $category['name'] ) ) {
+							$table->add_content( $component, $this->content_config );
+						}
+					}
+				}
+				$td_form->add_content( $table );
+
+				if ( isset( $this->buttons ) ) {
+					$first_button     = true;
+					$button_paragraph = new P( null, array( 'class' => 'submit' ) );
+					foreach ( $this->buttons as $button ) {
+						if ( isset( $button ) ) {
+							if ( ! $first_button ) {
+								$button_paragraph->add_content( '&nbsp;&nbsp;' );
+							}
+							$first_button = false;
+
+							$button_paragraph->add_content( $button, $this->content_config );
+						}
+					}
+					$td_form->add_content( $button_paragraph );
 				}
 			}
 		}

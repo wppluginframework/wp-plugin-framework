@@ -50,6 +50,10 @@ abstract class Html_Base_Component extends Html_Base_Element {
 		parent::__construct( $tag, $end_tag, $content, $attributes, $properties );
 	}
 
+	public function pick_client_side_value( $client_side_values ) {
+		return null;
+	}
+
 	/**
 	 * Summary.
 	 *
@@ -57,4 +61,10 @@ abstract class Html_Base_Component extends Html_Base_Element {
 	 */
 	public function set_value( $value ) {    }
 
+	/**
+	 * Summary.
+	 */
+	public function get_value( ) {
+		return null;
+	}
 }

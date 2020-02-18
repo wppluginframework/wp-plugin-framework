@@ -89,8 +89,6 @@ class Text_Line extends Input_Component {
 	}
 
 	public function create_content( $config = null ) {
-		$wrapper = parent::create_content( $config );
-
 		$input_attr          = $this->input_attributes;
 		$input_attr['name']  = $this->name;
 		$input_attr['value'] = $this->value;
@@ -103,11 +101,15 @@ class Text_Line extends Input_Component {
 
 		$input = new Input_Text( $input_attr );
 
-		$wrapper->add_content( $input );
-
-		if ( isset( $this->description ) ) {
-			$description = new P( $this->description, array( 'class' => 'description' ) );
-			$wrapper->add_content( $description );
+		if($this->single){
+			$this->add_content( $input );
+		} else {
+			$wrapper = parent::create_content( $config );
+			$wrapper->add_content( $input );
+			if ( isset( $this->description ) ) {
+				$description = new P( $this->description, array( 'class' => 'description' ) );
+				$wrapper->add_content( $description );
+			}
 		}
 	}
 }

@@ -103,8 +103,13 @@ class Check_Box extends Input_Component {
 	/**
 	 * Summary.
 	 */
-	public function clear_checkbox_before_form_post() {
-		$this->set_value( 0 );
+	public function pick_client_side_value($client_side_values) {
+		$value = parent::pick_client_side_value($client_side_values);
+		if( !isset( $value ) ) {
+			/* Checkboxes may not send anything when not checked. */
+			$value = 0;
+		}
+		return $value;
 	}
 
 	/**

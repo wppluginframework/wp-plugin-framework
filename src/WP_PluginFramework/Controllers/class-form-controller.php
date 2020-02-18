@@ -37,32 +37,6 @@ class Form_Controller extends Controller {
 	 * Summary.
 	 *
 	 * @param array $values
-	 *
-	 * @return array
-	 */
-	protected function load_form_values( $values = array() ) {
-		$values = parent::load_form_values( $values );
-
-		foreach ( $_POST as $key => $value ) {
-			if ( ( is_string( $key ) ) && ( is_string( $value ) ) ) {
-				if ( ( '_' !== $key[0] ) && ( 'action' !== $key ) ) {
-					/* jQuery ajax post adds double slashes */
-					$values[ $key ] = stripslashes( $value );
-				}
-			}
-		}
-
-		if ( isset( $this->view ) ) {
-			$this->view->clear_checkbox_before_form_post();
-		}
-
-		return $values;
-	}
-
-	/**
-	 * Summary.
-	 *
-	 * @param array $values
 	 */
 	protected function init_view( $values ) {
 		parent::init_view( $values );

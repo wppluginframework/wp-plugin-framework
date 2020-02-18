@@ -578,6 +578,9 @@ abstract class Controller {
 	 * @return array
 	 */
 	protected function load_form_values( $values = array() ) {
+		if ( isset( $this->view ) ) {
+			$values = $this->view->read_client_side_values( $values );
+		}
 		return $values;
 	}
 

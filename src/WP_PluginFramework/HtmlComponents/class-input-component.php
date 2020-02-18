@@ -51,6 +51,38 @@ class Input_Component extends Html_Base_Component {
 	protected $readonly = false;
 	/** @var array string */
 	protected $input_attributes = array();
+	/** @var boolean True will only draw the input element itself. */
+	protected $single;
+
+	/**
+	 * Summary.
+	 *
+	 * @param $id
+	 */
+	public function set_id( $id ) {
+		if( !isset( $this->name ) ) {
+			/* Every input must have a name in html attribute. */
+			$this->set_name( $id );
+		}
+		parent::set_id( $id );
+	}
+
+	/**
+	 * Summary.
+	 *
+	 * @param $client_side_values
+	 *
+	 * @return string
+	 */
+	public function pick_client_side_value($client_side_values) {
+		$value = null;
+		if( isset( $this->name ) ) {
+			if( isset( $client_side_values[$this->name] ) ) {
+				$value = $client_side_values[$this->name];
+			}
+		}
+		return $value;
+	}
 
 	/**
 	 * Summary.
