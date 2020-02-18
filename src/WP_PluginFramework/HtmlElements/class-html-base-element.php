@@ -74,7 +74,7 @@ abstract class Html_Base_Element extends Base_Object {
 	 * @param $value
 	 */
 	public function set_attribute( $key, $value ) {
-		$this->aet_property_key_values( 'attributes', $key, $value );
+		$this->set_property_key_values( 'attributes', $key, $value );
 	}
 
 	/**
@@ -94,7 +94,7 @@ abstract class Html_Base_Element extends Base_Object {
 	 * @param $class
 	 */
 	public function add_class( $class ) {
-		$this->aet_property_key_values( 'attributes', 'class', $class );
+		$this->set_property_key_values( 'attributes', 'class', $class );
 	}
 
 	/**

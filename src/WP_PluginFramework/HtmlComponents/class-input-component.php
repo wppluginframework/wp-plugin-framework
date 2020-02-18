@@ -82,7 +82,7 @@ class Input_Component extends Html_Base_Component {
 	 * @return bool
 	 */
 	public function add_input_class( $values ) {
-		if ( $this->aet_property_key_values( 'input_attributes', 'class', $values ) ) {
+		if ( $this->set_property_key_values( 'input_attributes', 'class', $values ) ) {
 			$form_selector = $this->get_form_selector();
 			$name          = $this->name;
 			$selector      = $form_selector . ' input[name=' . $name . ']';

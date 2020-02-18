@@ -342,7 +342,7 @@ abstract class Model extends Base_Object {
 	 * @param $errors
 	 */
 	public function add_validate_error( $key, $errors ) {
-		$this->aet_property_key_values( 'ValidationErrors', $key, $errors );
+		$this->set_property_key_values( 'ValidationErrors', $key, $errors );
 	}
 
 	/**

@@ -137,7 +137,7 @@ class Base_Object {
 	 *
 	 * @return bool|null    Return null if property does not exist. True on success. False on failure.
 	 */
-	protected function aet_property_key_values( $property, $key, $values ) {
+	protected function set_property_key_values( $property, $key, $values ) {
 		if ( isset( $this->$property ) ) {
 			if ( is_array( $this->$property ) ) {
 				if ( array_key_exists( $key, $this->$property ) ) {
