@@ -143,7 +143,7 @@ class Push_Button extends Html_Base_Component {
 		if ( ! isset( $config ) ) {
 			/* If no config, draw a stand-alone button with wrapped in a form */
 			if ( $this->add_parents_hidden_field ) {
-				$hidden_fields = $this->parent_view->get_property( 'HiddenFields' );
+				$hidden_fields = $this->parent_view->get_property( 'hidden_fields' );
 				foreach ( $hidden_fields as $hidden_field_attributes ) {
 					$this->add_hidden_fields( $hidden_field_attributes['name'], $hidden_field_attributes['value'] );
 				}
