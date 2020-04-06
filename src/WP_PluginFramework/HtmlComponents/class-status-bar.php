@@ -31,6 +31,7 @@ use WP_PluginFramework\HtmlElements\P;
 use WP_PluginFramework\HtmlElements\Strong;
 use WP_PluginFramework\HtmlElements\Span;
 use WP_PluginFramework\HtmlElements\Button;
+use WP_PluginFramework\Utils\Debug_Logger;
 
 /**
  * Summary.
@@ -100,12 +101,16 @@ class Status_Bar extends Html_Base_Component {
 		$this->text   = $text;
 		$this->status = $status;
 
-		$id       = $this->attributes['id'];
-		$selector = 'div#' . $id;
-		$bar      = $this->create_html_bar( $text, $status );
-		$html     = $bar->draw_html();
+		if (isset($this->attributes['id'])) {
+			$id       = $this->attributes['id'];
+			$selector = 'div#' . $id;
+			$bar      = $this->create_html_bar( $text, $status );
+			$html     = $bar->draw_html();
 
-		$this->update_client_dom( $selector, 'html', array( $html ) );
+			$this->update_client_dom( $selector, 'html', array( $html ) );
+		} else {
+			Debug_Logger::write_debug_error( 'Component not registered.');
+		}
 	}
 
 	/**
