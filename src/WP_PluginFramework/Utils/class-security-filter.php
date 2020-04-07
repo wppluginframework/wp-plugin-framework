@@ -55,27 +55,39 @@ class Security_Filter {
 	}
 
 	public static function sanitize_alpha_num_text( $text ) {
-		if ( preg_match( '/^[A-Za-z0-9]+$/', $text ) ) {
-			return strval( $text );
+		if ( $text === '' ) {
+			return '';
 		} else {
-			return null;
+			if ( preg_match( '/^[A-Za-z0-9]+$/', $text ) ) {
+				return strval( $text );
+			}
 		}
+
+		return null;
 	}
 
 	public static function aanitize_alpha_text( $text ) {
-		if ( preg_match( '/^[A-Za-z]+$/', $text ) ) {
-			return strval( $text );
+		if ( $text === '' ) {
+			return '';
 		} else {
-			return null;
+			if ( preg_match( '/^[A-Za-z]+$/', $text ) ) {
+				return strval( $text );
+			}
 		}
+
+		return null;
 	}
 
 	public static function sanitize_key_name_text( $text ) {
-		if ( preg_match( '/^[A-Za-z0-9_\-]+$/', $text ) ) {
-			return strval( $text );
+		if ( $text === '' ) {
+			return '';
 		} else {
-			return null;
+			if ( preg_match( '/^[A-Za-z0-9_\-]+$/', $text ) ) {
+				return strval( $text );
+			}
 		}
+
+		return null;
 	}
 
 	public static function sanitize_integer( $text ) {
@@ -208,7 +220,7 @@ class Security_Filter {
 	}
 
 	public static function safe_read_get_request( $key, $filter_datatype ) {
-		if ( isset( $_GET[ $key ] ) && ( '' !== $_GET[ $key ] ) ) {
+		if ( isset( $_GET[ $key ] ) ) {
 			return self::filter( $_GET[ $key ], $filter_datatype );
 		} else {
 			return null;
