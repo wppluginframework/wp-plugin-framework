@@ -45,7 +45,7 @@ div.wpf-controller label.wpf-label{
     font-weight: bold;
 }
 
-div.wpf-controller button{
+div.wpf-controller button, input[type="button" i]{
     background-color: #4D90FE;
     background-image: none;
     border: 1px solid #3079ED;
