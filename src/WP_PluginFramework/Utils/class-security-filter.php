@@ -49,9 +49,9 @@ class Security_Filter {
 	public static function sanitize_text( $text ) {
 		if ( preg_match( '/^[A-Za-z0-9 .,;:+=?_~\/\-!@#\$%\^&\*\(\)]+$/', $text ) ) {
 			return strval( $text );
-		} else {
-			return null;
 		}
+
+		return null;
 	}
 
 	public static function sanitize_alpha_num_text( $text ) {
@@ -270,22 +270,5 @@ class Security_Filter {
 		} else {
 			return null;
 		}
-	}
-
-	public static function sanitize_text_alpanum( $text ) {
-		return true;
-	}
-
-	public static function sanitize_text_alpanum_symbols( $text ) {
-		return true;
-
-	}
-
-	public static function remove_list_item( $list, $item ) {
-		$position = array_search( $item, $list );
-		if ( null !== $position ) {
-			unset( $list[ $position ] );
-		}
-		return $list;
 	}
 }
