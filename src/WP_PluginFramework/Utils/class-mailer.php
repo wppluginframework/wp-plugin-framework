@@ -56,7 +56,8 @@ class Mailer {
 	 * @return bool
 	 */
 	public function set_from_address( $email_adr ) {
-		if ( filter_var( $email_adr, FILTER_VALIDATE_EMAIL ) ) {
+		$email_adr = $this->validate_email_address($email_adr);
+		if ($email_adr) {
 			$this->from_address = $email_adr;
 			return true;
 		} else {
@@ -72,7 +73,8 @@ class Mailer {
 	 * @return bool
 	 */
 	public function add_receiver_address( $email_adr ) {
-		if ( filter_var( $email_adr, FILTER_VALIDATE_EMAIL ) ) {
+		$email_adr = $this->validate_email_address($email_adr);
+		if ($email_adr) {
 			$this->receiver_address_list[] = $email_adr;
 			return true;
 		} else {
@@ -88,7 +90,8 @@ class Mailer {
 	 * @return bool
 	 */
 	public function add_copy_address( $email_adr ) {
-		if ( filter_var( $email_adr, FILTER_VALIDATE_EMAIL ) ) {
+		$email_adr = $this->validate_email_address($email_adr);
+		if ($email_adr) {
 			$this->copy_address_list[] = $email_adr;
 			return true;
 		} else {
@@ -143,5 +146,45 @@ class Mailer {
 		}
 
 		return $result;
+	}
+
+
+	public function validate_email_address($email)
+	{
+		$from_name = '';
+		$from_email = '';
+
+		$bracket_pos = strpos( $email, '<' );
+		if ( false !== $bracket_pos ) {
+			// Text before the bracketed email is the "From" name.
+			if ( $bracket_pos > 0 ) {
+				$from_name = substr( $email, 0, $bracket_pos - 1 );
+				$from_name = str_replace( '"', '', $from_name );
+				$from_name = trim( $from_name );
+			}
+
+			$from_email = substr( $email, $bracket_pos + 1 );
+			$from_email = str_replace( '>', '', $from_email );
+			$from_email = trim( $from_email );
+
+			// Avoid setting an empty $from_email.
+		} elseif ( '' !== trim( $email ) ) {
+			$from_email = trim( $email );
+		}
+
+		if (filter_var($from_email, FILTER_VALIDATE_EMAIL))
+		{
+			if($from_name) {
+				$email = $from_name . ' <' . $from_email . '>';
+			} else {
+				$email = $from_email;
+			}
+		}
+		else
+		{
+			$email = false;
+		}
+
+		return $email;
 	}
 }
