@@ -199,8 +199,19 @@ class Input_Component extends Html_Base_Component {
 				$this->add_content( $tr );
 			}
 
-			$td_wrapper = new Td( null, $config['form_placeholder_td_attr'] );
-			$tr         = new Tr( $td_wrapper, $config['form_placeholder_tr_attr'] );
+			$form_placeholder_td_attr = null;
+			if(isset($config['form_placeholder_td_attr']))
+			{
+				$form_placeholder_td_attr = $config['form_placeholder_td_attr'];
+			}
+			$td_wrapper = new Td(null, $form_placeholder_td_attr);
+
+			$form_placeholder_tr_attr = null;
+			if(isset($config['form_placeholder_tr_attr']))
+			{
+				$form_placeholder_tr_attr = $config['form_placeholder_tr_attr'];
+			}
+			$tr = new Tr($td_wrapper, $form_placeholder_tr_attr);
 			$this->add_content( $tr );
 		}
 
