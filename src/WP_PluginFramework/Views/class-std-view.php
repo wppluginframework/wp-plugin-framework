@@ -35,6 +35,7 @@ use WP_PluginFramework\HtmlElements\H;
 use WP_PluginFramework\HtmlElements\Hr;
 use WP_PluginFramework\HtmlElements\P;
 use WP_PluginFramework\HtmlElements\Table;
+use WP_PluginFramework\HtmlElements\Tbody;
 use WP_PluginFramework\HtmlElements\Td;
 use WP_PluginFramework\HtmlElements\Tr;
 use WP_PluginFramework\Utils\Debug_Logger;
@@ -72,7 +73,8 @@ class Std_View extends Form_View {
 		$this->content_config['form_input_width']           = '400px';
 		$this->content_config['form_input_layout']          = 'single_column_table';
 		$this->content_config['form_placeholder_table_attr']= array( 'class' => 'wpf-table-placeholder' );
-		$this->content_config['form_placeholder_tr_attr']   = null;
+		$this->content_config['form_placeholder_tbody_attr']= array( 'class' => 'wpf-table-placeholder' );
+		$this->content_config['form_placeholder_tr_attr']   = array( 'class' => 'wpf-table-placeholder' );
 		$this->content_config['form_placeholder_th_attr']   = array( 'class' => 'wpf-table-placeholder-input' );
 		$this->content_config['form_placeholder_td_attr']   = array( 'class' => 'wpf-table-placeholder-input' );
 	}
@@ -240,7 +242,8 @@ class Std_View extends Form_View {
 			$td_spacing                  = new Td( null, $this->content_config['form_placeholder_td_attr'] );
 			$this->form_table_tr_wrapper = new Tr( $td_form, $this->content_config['form_placeholder_tr_attr'] );
 			$this->form_table_tr_wrapper->add_content( $td_spacing );
-			$table_wrapper = new Table( $this->form_table_tr_wrapper, $this->content_config['form_placeholder_table_attr'] );
+			$tbody_wrapper = new Tbody( $this->form_table_tr_wrapper, $this->content_config['form_placeholder_tbody_attr'] );
+			$table_wrapper = new Table($tbody_wrapper, $this->content_config['form_placeholder_table_attr']);
 			$wrapper->add_content( $table_wrapper );
 		} else {
 			$td_form = $wrapper;
@@ -260,12 +263,13 @@ class Std_View extends Form_View {
 		}
 
 		if ( empty( $this->input_form_categories ) ) {
-			$table = new Table( null, $this->content_config['form_placeholder_table_attr'] );
+			$tbody = new TBody( null, $this->content_config['form_placeholder_tbody_attr'] );
 			foreach ( $this->form_inputs as $component ) {
 				if ( isset( $component ) ) {
-					$table->add_content( $component, $this->content_config );
+					$tbody->add_content( $component, $this->content_config );
 				}
 			}
+			$table = new Table($tbody, $this->content_config['form_placeholder_table_attr']);
 			$td_form->add_content( $table );
 
 			if ( isset( $this->buttons ) ) {
@@ -299,14 +303,15 @@ class Std_View extends Form_View {
 					$td_form->add_content( $description );
 				}
 
-				$table = new Table( null, $this->content_config['form_placeholder_table_attr'] );
+				$tbody = new Tbody( null, $this->content_config['form_placeholder_tbody_attr'] );
 				foreach ( $this->form_inputs as $component ) {
 					if ( isset( $component ) ) {
 						if ( isset( $component->category ) && ( $component->category === $category['name'] ) ) {
-							$table->add_content( $component, $this->content_config );
+							$tbody->add_content( $component, $this->content_config );
 						}
 					}
 				}
+				$table = new Table($tbody, $this->content_config['form_placeholder_table_attr']);
 				$td_form->add_content( $table );
 
 				if ( isset( $this->buttons ) ) {
