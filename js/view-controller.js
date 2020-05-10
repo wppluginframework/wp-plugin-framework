@@ -137,6 +137,9 @@ jQuery(document).ready(function($)
                                     window[work_item.function](work_item.arguments);
                                     break;
 
+                                case 'do_window_action':
+                                    window[work_item.object][work_item.function](work_item.arguments);
+                                    break;
                             }
                         }
                     } else {

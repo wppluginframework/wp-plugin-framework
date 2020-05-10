@@ -118,6 +118,11 @@ abstract class View extends Html_Base_Element {
 		$this->call_backs[] = $event;
 	}
 
+	public function update_client_reload_page()
+	{
+		$this->update_client_do_window_action('location', 'reload', true);
+	}
+
 	public function update_client_add_callback( $event, $arguments, $controller, $view, $wp_nonce ) {
 		if ( isset( $arguments ) ) {
 			if ( ! is_array( $arguments ) ) {
@@ -137,6 +142,17 @@ abstract class View extends Html_Base_Element {
 		$work_item['selector']   = '#' . $this->id;
 		$work_items[]            = $work_item;
 		$this->add_ajax_response( $work_items );
+	}
+
+	public function update_client_do_window_action($object, $function, $arguments=null)
+	{
+		$work_item = array();
+		$work_item['type'] = 'do_window_action';
+		$work_item['object'] = $object;
+		$work_item['function'] = $function;
+		$work_item['arguments'] = $arguments;
+		$work_items[] = $work_item;
+		$this->add_ajax_response($work_items);
 	}
 
 	public function update_client_call_function( $js_function, $arguments ) {
