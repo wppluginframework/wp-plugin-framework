@@ -228,13 +228,19 @@ class Plugin_Container {
 			self::$plugin_data               = get_plugin_data( $plugin_file, false, false );
 			self::$plugin_data['PluginFile'] = $plugin_file;
 			self::$plugin_data['PluginSlug'] = $plugin_slug;
+			self::$plugin_data['Version'] = strtolower(trim(self::$plugin_data['Version']));
+			$split = explode(' ', self::$plugin_data['Version']);
+			if(count ($split) > 1) {
+				self::$plugin_data['Edition'] = $split[0];
+				self::$plugin_data['Version'] = $split[1];
+			} else {
+				self::$plugin_data['Edition'] = 'standard';
+			}
+			self::$plugin_data['EditionCode'] = '';
+			self::$plugin_data['EditionRev']  = '';
 
 			/* Create a plugin prefix from author name, using 3 first letter converted to lower case. */
 			self::$plugin_data['PluginPrefix'] = substr( strtolower( preg_replace( '/[^a-zA-Z]+/', '', self::$plugin_data['Author'] ) ), 0, 3 );
-
-			self::$plugin_data['Edition']     = 'Standard';
-			self::$plugin_data['EditionCode'] = '';
-			self::$plugin_data['EditionRev']  = '';
 
 			foreach ( $plugin_data as $key => $value ) {
 				self::$plugin_data[ $key ] = $value;
@@ -246,7 +252,7 @@ class Plugin_Container {
 		return self::$wp_framework_namespace;
 	}
 
-	protected static function get_plugin_edition() {
+	public static function get_plugin_edition() {
 		return self::$plugin_data['Edition'];
 	}
 
