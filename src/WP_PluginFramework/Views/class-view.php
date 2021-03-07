@@ -94,11 +94,7 @@ abstract class View extends Html_Base_Element {
 		return $this->draw_html();
 	}
 
-	public function create_content( $parameters = null, $wrapper = null ) {
-		if ( ! isset( $wrapper ) ) {
-			$wrapper = $this;
-		}
-
+	public function create_content( $parameters = null ) {
 		if ( isset( $this->div_wrapper ) ) {
 			$attributes = $this->div_wrapper;
 
@@ -106,12 +102,9 @@ abstract class View extends Html_Base_Element {
 				$attributes['id'] = $this->id;
 			}
 
-			$div_wrapper = new Div( null, $attributes );
-			$wrapper->add_content( $div_wrapper );
-			$wrapper = $div_wrapper;
+			$div_wrapper = new Div( $this->contents, $attributes );
+			$this->set_content( $div_wrapper );
 		}
-
-		return $wrapper;
 	}
 
 	public function register_callback( $event ) {

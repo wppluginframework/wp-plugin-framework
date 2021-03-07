@@ -24,6 +24,7 @@
 
 namespace WP_PluginFramework\Views;
 
+use WP_PluginFramework\HtmlComponents\Status_Bar;
 use WP_PluginFramework\Plugin_Container;
 
 /**
@@ -41,6 +42,20 @@ class Admin_Std_View extends Std_View {
 	 */
 	public function __construct( $id, $controller ) {
 		parent::__construct( $id, $controller );
+
+        $this->admin_status_bar = new Status_Bar( Status_Bar::TYPE_REMOVABLE_BLOCK );
+        $this->register_component( 'admin_status_bar', $this->admin_status_bar );
+
+        $this->content_config['form_input_layout']           = 'double_column_table';
+        $this->content_config['form_placeholder_table_attr'] = array( 'class' => 'form-table' );
+        $this->content_config['form_placeholder_tr_attr']    = null;
+        $this->content_config['form_placeholder_th_attr']    = array( 'class' => 'row' );
+        $this->content_config['form_placeholder_td_attr']    = null;
+        $this->content_config['form_input_encapsulation'] = null;
+        $this->content_config['form_input_width'] = '100%';
+
+        /* Make admin panel identical to common WordPress admin panels to get the ordinary admin panel style. */
+        $this->remove_div_wrapper();
 	}
 
 	/**
@@ -63,4 +78,10 @@ class Admin_Std_View extends Std_View {
 
 		parent::register_component( $id, $component );
 	}
+
+    public function create_content( $parameters = null ) {
+        $this->add_content( $this->admin_status_bar );
+
+        parent::create_content( $parameters );
+    }
 }

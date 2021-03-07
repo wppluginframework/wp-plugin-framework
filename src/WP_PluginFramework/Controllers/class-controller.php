@@ -279,6 +279,12 @@ abstract class Controller {
 		return $controller;
 	}
 
+    public function create_content() {}
+
+    public function draw_html() {
+	    return $this->draw();
+    }
+
 	/**
 	 * Summary.
 	 *

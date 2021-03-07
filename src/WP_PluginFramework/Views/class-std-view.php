@@ -214,20 +214,14 @@ class Std_View extends Form_View {
 		}
 	}
 
-	public function create_content( $parameters = null, $wrapper = null ) {
-		if ( ! isset( $wrapper ) ) {
-			$wrapper = $this;
-		}
-
-		$wrapper = parent::create_content( $parameters, $wrapper );
-
+	public function create_content( $parameters = null ) {
 		if ( isset( $this->headers ) ) {
 			foreach ( $this->headers as $header ) {
 				if ( is_string( $header ) ) {
 					$header = new H( 1, $header );
-					$wrapper->add_content( $header );
+					$this->add_content( $header );
 				} elseif ( is_object( $header ) ) {
-					$wrapper->add_content( $header, $this->content_config );
+					$this->add_content( $header, $this->content_config );
 				} else {
 					Debug_Logger::write_debug_error( 'Unhandled component type ' . gettype( $header ) );
 				}
@@ -244,9 +238,9 @@ class Std_View extends Form_View {
 			$this->form_table_tr_wrapper->add_content( $td_spacing );
 			$tbody_wrapper = new Tbody( $this->form_table_tr_wrapper, $this->content_config['form_placeholder_tbody_attr'] );
 			$table_wrapper = new Table($tbody_wrapper, $this->content_config['form_placeholder_table_attr']);
-			$wrapper->add_content( $table_wrapper );
+			$this->add_content( $table_wrapper );
 		} else {
-			$td_form = $wrapper;
+			$td_form = $this;
 		}
 
 		if ( isset( $parameters ) ) {
@@ -337,16 +331,16 @@ class Std_View extends Form_View {
 			foreach ( $this->footers as $footer ) {
 				if ( is_string( $footer ) ) {
 					$footer = new P( $footer );
-					$wrapper->add_content( $footer );
+					$this->add_content( $footer );
 				} elseif ( is_object( $footer ) ) {
 					$footer->create_content( $this->content_config );
-					$wrapper->add_content( $footer );
+					$this->add_content( $footer );
 				} else {
 					Debug_Logger::write_debug_error( 'Unhandled component type ' . gettype( $footer ) );
 				}
 			}
 		}
 
-		return $wrapper;
+		parent::create_content( $parameters );
 	}
 }

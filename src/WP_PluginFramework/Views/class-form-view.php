@@ -81,12 +81,7 @@ class Form_View extends View {
 		$this->hidden_fields[] = $attributes;
 	}
 
-	public function create_content( $parameters = null, $wrapper = null ) {
-		if ( ! isset( $wrapper ) ) {
-			$wrapper = $this;
-		}
-
-		$wrapper = parent::create_content( $parameters, $wrapper );
+	public function create_content( $parameters = null ) {
 		if ( $this->show_form ) {
 			$attributes = array();
 			switch ( $this->method ) {
@@ -110,17 +105,16 @@ class Form_View extends View {
 				$attributes['id'] = $this->form_id;
 			}
 
-			$form = new Form( null, $attributes );
+			$form = new Form( $this->contents, $attributes );
 
 			foreach ( $this->hidden_fields as $hidden_field_attributes ) {
 				$hidden_input = new Input_Hidden( $hidden_field_attributes );
 				$form->add_content( $hidden_input );
 			}
 
-			$wrapper->add_content( $form );
-			$wrapper = $form;
+			$this->set_content( $form );
 		}
 
-		return $wrapper;
+		parent::create_content( $parameters );
 	}
 }

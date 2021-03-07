@@ -49,7 +49,7 @@ class Plugin_Container {
 	protected static $plugin_namespace                  = null;
 	private static $wp_framework_namespace              = null;
 	protected static $auto_loader_includes              = array();
-	protected static $auto_loader_wp_framework_includes = array( 'Base', 'Controllers', 'Database', 'DataTypes', 'HtmlComponents', 'HtmlElements', 'Models', 'Utils', 'Views' );
+	protected static $auto_loader_wp_framework_includes = array( 'Base', 'Controllers', 'Database', 'DataTypes', 'HtmlComponents', 'HtmlElements', 'Models', 'Pages', 'Utils', 'Views' );
 
 	public static $permitted_html_elements = array( 'b', 'i', 'u', 'strong', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr', 'br' );
 
