@@ -44,23 +44,23 @@ class Debug_Logger {
 	protected static $write_wp_log_to_buffer = false;
 	protected static $write_wp_log_buffer    = array();
 
-	public static function write_debug_error( $data1 = null, $data2 = null, $data3 = null ) {
-		self::write_debug_log( self::ERROR, $data1, $data2, $data3 );
+	public static function write_debug_error( $data1 = null, $data2 = null, $data3 = null, $data4 = null ) {
+		self::write_debug_log( self::ERROR, $data1, $data2, $data3, $data4 );
 	}
 
-	public static function write_debug_warning( $data1 = null, $data2 = null, $data3 = null ) {
+	public static function write_debug_warning( $data1 = null, $data2 = null, $data3 = null, $data4 = null ) {
 		$plugin = Plugin_Container::instance();
 
 		if ( ( $plugin->get_debug_enable() ) && ( $plugin->get_debug_level() >= self::WARNING ) ) {
-			self::write_debug_log( self::WARNING, $data1, $data2, $data3 );
+			self::write_debug_log( self::WARNING, $data1, $data2, $data3, $data4 );
 		}
 	}
 
-	public static function write_debug_note( $data1 = null, $data2 = null, $data3 = null ) {
+	public static function write_debug_note( $data1 = null, $data2 = null, $data3 = null, $data4 = null ) {
 		$plugin = Plugin_Container::instance();
 
 		if ( ( $plugin->get_debug_enable() ) && ( $plugin->get_debug_level() >= self::NOTE ) ) {
-			self::write_debug_log( self::NOTE, $data1, $data2, $data3 );
+			self::write_debug_log( self::NOTE, $data1, $data2, $data3, $data4 );
 		}
 	}
 
@@ -100,21 +100,25 @@ class Debug_Logger {
 		return $text;
 	}
 
-	public static function write_debug_log( $type, $data1, $data2, $data3 ) {
+	public static function write_debug_log( $type, $data1, $data2, $data3, $data4 ) {
 		$trace = debug_backtrace();
 		$txt   = self::get_trace( $trace, 2 );
 
-		if ( $data1 ) {
+		if ( isset($data1) ) {
 			$txt .= ' ' . self::safe_dump( $data1 );
 		}
 
-		if ( $data2 ) {
+		if ( isset($data2) ) {
 			$txt .= ' ' . self::safe_dump( $data2 );
 		}
 
-		if ( $data3 ) {
+		if ( isset($data3) ) {
 			$txt .= ' ' . self::safe_dump( $data3 );
 		}
+
+        if ( isset($data4) ) {
+            $txt .= ' ' . self::safe_dump( $data4 );
+        }
 
 		self::write_debug_file( $type, $txt );
 
@@ -192,7 +196,8 @@ class Debug_Logger {
 
 		if ( $plugin->get_debug_enable() ) {
 			$log_msg = '[' . date( 'd-M-Y H:i:s ', time() ) . 'UTC] ' . $type_txt . ' ' . $user_txt . $txt . "\r\n";
-			error_log( $log_msg, 3, WP_CONTENT_DIR . '/read_more_login_plugin.log' );
+            $plugin_slug = $plugin->get_plugin_slug();
+			error_log( $log_msg, 3, WP_CONTENT_DIR . '/' . $plugin_slug .'_plugin.log' );
 		}
 
 		if ( self::ERROR === $type ) {
@@ -226,6 +231,14 @@ class Debug_Logger {
 			case 'integer':
 				$txt = strval( $data );
 				break;
+
+            case 'float':
+                $txt = floatval( $data );
+                break;
+
+            case 'double':
+                $txt = doubleval( $data );
+                break;
 
 			case 'string':
 				if ( strlen( $data ) > self::MAX_STRING_LENGTH_DUMP ) {
