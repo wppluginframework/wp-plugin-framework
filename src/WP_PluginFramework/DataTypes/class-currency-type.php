@@ -24,6 +24,8 @@
 
 namespace WP_PluginFramework\DataTypes;
 
+use WP_PluginFramework\Utils\Debug_Logger;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -33,21 +35,61 @@ defined( 'ABSPATH' ) || exit;
  */
 class Currency_Type extends Data_Type {
 
-	protected static $default_data_type = 'double';
+    protected static $default_data_type         = 'integer';
+    protected static $default_string_validation = '/^[0-9]+/';
+    protected $decimals = null;
+    protected $unit = null;
 
 	public function __construct( $metadata, $key, $value = null ) {
 		if ( ! isset( $metadata['data_size'] ) ) {
 			$metadata['data_size'] = 12;
 		}
 		if ( ! isset( $metadata['db_field_type'] ) ) {
-			$metadata['db_field_type'] = 'DECIMAL(10,2)';
+            $metadata['db_field_type'] = 'bigint(20)';
 		}
+        if ( ! isset( $metadata['decimals'] ) ) {
+            $metadata['decimals'] = 2;
+        }
+        if ( ! isset( $metadata['unit'] ) ) {
+            $metadata['unit'] = '';
+        }
 
 		parent::__construct( $metadata, $key, $value );
 	}
 
 	public function get_formatted_text() {
-		$s = number_format( $this->value, 2, '.', ',' );
+        $v = doubleval($this->value) / doubleval(pow(10, $this->decimals));
+		$s = number_format( $v, $this->decimals, '.', ',' );
+		$s = $this->unit . ' ' . $s;
 		return $s;
 	}
+
+    public function set_value( $value ) {
+        switch ( gettype( $value ) ) {
+            case 'string':
+                $this->value = intval( $value );
+                break;
+
+            case 'integer':
+                $this->value = $value;
+                break;
+
+            default:
+                Debug_Logger::write_debug_error( 'Unsupported data type ' . gettype( $value ) );
+                break;
+        }
+    }
+
+    public function set_unit( $unit ) {
+        switch ( gettype( $unit ) ) {
+            case 'string':
+                $this->unit =$unit;
+                break;
+
+            default:
+                Debug_Logger::write_debug_error( 'Unsupported data type ' . gettype( $value ) );
+                break;
+        }
+    }
+
 }
