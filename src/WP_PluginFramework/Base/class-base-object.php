@@ -24,6 +24,8 @@
 
 namespace WP_PluginFramework\Base;
 
+use WP_PluginFramework\Utils\Debug_Logger;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -53,6 +55,9 @@ class Base_Object {
 	 * @param array $properties Properties to be stored in object.
 	 */
 	public function set_properties( $properties ) {
+	    if( $properties === null ) {
+	        Debug_Logger::write_debug_error('Empty properties.');
+        }
 		foreach ( $properties as $key => $value ) {
 			$this->$key = $value;
 		}
