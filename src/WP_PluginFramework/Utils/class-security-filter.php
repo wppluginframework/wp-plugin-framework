@@ -103,7 +103,7 @@ class Security_Filter {
 	}
 
 	public static function sanitize_positive_integer_or_zero( $text ) {
-		if ( preg_match( '/^[1-9][0-9]{0,15}$/', $text ) ) {
+		if ( preg_match( '/^[0-9]{0,20}$/', $text ) ) {
 			$value = intval( $text );
 			if ( gettype( $value ) === 'integer' ) {
 				if ( $value >= 0 ) {
