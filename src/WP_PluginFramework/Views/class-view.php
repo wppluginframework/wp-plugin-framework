@@ -55,6 +55,12 @@ abstract class View extends Html_Base_Element {
 	public function __construct( $controller, $content = null, $attributes = null ) {
 		parent::__construct( null, null, $content, $attributes );
 		$this->controller = $controller;
+
+        if(is_admin()) {
+            $this->div_wrapper = array('class' => 'wpf-controller wpf-controller-admin-style');
+        } else {
+            $this->div_wrapper = array('class' => 'wpf-controller wpf-controller-style');
+        }
 	}
 
 	public function add_div_wrapper( $attributes ) {

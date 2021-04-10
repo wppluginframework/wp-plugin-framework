@@ -1,23 +1,27 @@
-div.wpf-controller .wpf-table-placeholder,
-div.wpf-controller table.wpf-table-placeholder tbody tr,
-div.wpf-controller table.wpf-table-placeholder tr,
-div.wpf-controller .wpf-table-placeholder-input,
-div.wpf-controller td.wpf-table-placeholder-input fieldset{
+div.wpf-controller-style .wpf-table-placeholder,
+div.wpf-controller-style table.wpf-table-placeholder tbody tr,
+div.wpf-controller-style table.wpf-table-placeholder tr,
+div.wpf-controller-style .wpf-table-placeholder-input,
+div.wpf-controller-style td.wpf-table-placeholder-input fieldset{
     margin: 0 !important;
     border: none !important;
     padding: 0 !important;
     background-color: transparent !important;
 }
 
-div.wpf-controller table.wpf-table-placeholder{
+div.wpf-controller-style table.wpf-table-placeholder{
     width: 100%;
 }
 
-div.wpf-controller td.wpf-table-placeholder-input{
+div.wpf-controller-style td.wpf-table-placeholder-input{
     padding: 0 0 15px 0 !important;
 }
 
-div.wpf-controller input.regular-text{
+div.wpf-controller-style p.wpf-table-input-description {
+    margin-bottom: 5px;
+}
+
+div.wpf-controller-style input.regular-text{
     margin: 0;
     width: 85%;
     border: 1px solid #aaa;
@@ -30,11 +34,11 @@ div.wpf-controller input.regular-text{
     font-size: 1.4em;
 }
 
-div.wpf-controller input.wpf-input-error{
+div.wpf-controller-style input.wpf-input-error{
     border: 1px solid red;
 }
 
-div.wpf-controller label.wpf-label{
+div.wpf-controller-style label.wpf-label{
     margin: 0;
     padding: 0;
     text-transform: uppercase;
@@ -45,7 +49,7 @@ div.wpf-controller label.wpf-label{
     font-weight: bold;
 }
 
-div.wpf-controller button, input[type="button" i]{
+div.wpf-controller-style button, input[type="button" i]{
     background-color: #4D90FE;
     background-image: none;
     border: 1px solid #3079ED;
@@ -69,21 +73,21 @@ div.wppmvcf-status-bar{
     margin-top:10px;
 }
 
-div.wpf-controller div.wppmvcf-status-bar-info{
+div.wpf-controller-style div.wppmvcf-status-bar-info{
     margin: 15px 0;
 }
 
-div.wpf-controller div.wppmvcf-status-bar-success{
+div.wpf-controller-style div.wppmvcf-status-bar-success{
     color: green;
     margin: 15px 0;
 }
 
-div.wpf-controller div.wppmvcf-status-bar-error{
+div.wpf-controller-style div.wppmvcf-status-bar-error{
     color: red;
     margin: 15px 0;
 }
 
-div.wpf-controller input.wpf-checkbox-input{
+div.wpf-controller-style input.wpf-checkbox-input{
     margin: 1px;
     vertical-align: middle;
     box-sizing: inherit;
@@ -93,7 +97,7 @@ div.wpf-controller input.wpf-checkbox-input{
     line-height: 1.2em;
 }
 
-div.wpf-controller input[type='checkbox'].wpf-input-error {
+div.wpf-controller-style input[type='checkbox'].wpf-input-error {
     outline: 1px solid red;
 }
 

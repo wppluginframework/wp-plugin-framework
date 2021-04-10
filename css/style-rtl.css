@@ -1,8 +1,8 @@
-div.wpf-controller .wpf-table-placeholder-input{
+div.wpf-controller-style .wpf-table-placeholder-input{
     text-align: right;
 }
 
-div.wpf-controller label.wpf-label{
+div.wpf-controller-style label.wpf-label{
     text-align: right;
 }
 
