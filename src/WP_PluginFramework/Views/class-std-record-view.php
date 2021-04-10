@@ -2,7 +2,7 @@
 /**
  * WordPress Plugin MVC Framework Library
  *
- * Copyright (C) 2018 Arild Hegvik.
+ * Copyright (C) 2021 Arild Hegvik.
  *
  * GNU LESSER GENERAL PUBLIC LICENSE (GNU LGPLv3)
  *
