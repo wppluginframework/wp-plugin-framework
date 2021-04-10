@@ -44,7 +44,7 @@ class Email_Type extends String_Type {
 		if ( is_email( $value ) ) {
 			return true;
 		} else {
-			$this->add_validate_errors( esc_html__( 'Error. Invalid e-mail address format.', 'read-more-login' ) );
+			$this->add_validate_errors( 'Error. Invalid e-mail address format.');
 			return false;
 		}
 	}

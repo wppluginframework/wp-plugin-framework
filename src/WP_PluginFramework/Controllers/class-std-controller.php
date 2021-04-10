@@ -118,7 +118,7 @@ class Std_Controller extends Form_Controller {
 			if ( ! empty( $required_errors ) ) {
 				$labels = implode( ', ', $required_errors );
 				/* translators: %s: Lists missing input fields. */
-				$message .= esc_html( sprintf( esc_html__( 'Error. Required field missing: %s.', 'read-more-login' ), $labels ) );
+				$message .= esc_html( sprintf('Error. Required field missing: %s.', $labels ) );
 			}
 
 			if ( ! empty( $invalid_errors ) ) {
@@ -127,7 +127,7 @@ class Std_Controller extends Form_Controller {
 				}
 				$labels = implode( ', ', $invalid_errors );
 				/* translators: %s: Lists entered input fields having errors. */
-				$message = esc_html( sprintf( esc_html__( 'Error. Invalid data: %s.', 'read-more-login' ), $labels ) );
+				$message = esc_html( sprintf( 'Error. Invalid data: %s.', $labels ) );
 			}
 
 			if ( ! empty( $other_error_message ) ) {
@@ -139,7 +139,7 @@ class Std_Controller extends Form_Controller {
 			}
 
 			if ( ! $message ) {
-				$message = esc_html__( 'Error. Invalid input data.', 'read-more-login' );
+				$message = 'Error. Invalid input data.';
 			}
 
 			$this->view->status_bar_footer->set_status_text( $message, Status_Bar::STATUS_ERROR );

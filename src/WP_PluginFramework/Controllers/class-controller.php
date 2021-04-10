@@ -359,7 +359,7 @@ abstract class Controller {
 				Debug_Logger::write_debug_error( 'DrawView returned nothing.' );
 			}
 		} else {
-			$response = esc_html__( 'Error: Invalid permission.', 'read-more-login' );
+			$response = 'Error: Invalid permission.';
 		}
 
 		return $response;
@@ -413,22 +413,22 @@ abstract class Controller {
 						$response['work']         = $this->ajax_response;
 					} else {
 						$response['result']  = 'error';
-						$response['message'] = esc_html__( 'Error: Invalid server request.', 'read-more-login' );
+						$response['message'] = 'Error: Invalid server request.';
 						Debug_Logger::write_debug_error( 'Invalid ajax event: Event=' . $this->event . ' EventType=' . $this->event_type . ' EventSource=' . $this->event_source );
 					}
 				} else {
 					$response['result']  = 'error';
-					$response['message'] = esc_html__( 'Error: Session has expired. Please reload page.', 'read-more-login' );
+					$response['message'] = 'Error: Session has expired. Please reload page.';
 					Debug_Logger::write_debug_note( 'Invalid wpnonce. (Or nonce expired because user logged out and in again.)' );
 				}
 			} else {
 				$response['result']  = 'error';
-				$response['message'] = esc_html__( 'Error: Invalid server request.', 'read-more-login' );
+				$response['message'] = 'Error: Invalid server request.';
 				Debug_Logger::write_debug_error( 'Missing nonce.' );
 			}
 		} else {
 			$response['result']  = 'error';
-			$response['message'] = esc_html__( 'Error: Invalid permission.', 'read-more-login' ) . $this->invalid_permissions_message();
+			$response['message'] = 'Error: Invalid permission. ' . $this->invalid_permissions_message();
 		}
 
 		$response_json = wp_json_encode( $response );
@@ -525,20 +525,20 @@ abstract class Controller {
 	 */
 	protected function invalid_permissions_message() {
 		if ( ! isset( $this->required_login ) ) {
-			return esc_html__( 'Error. Invalid permission.', 'read-more-login' );
+			return 'Error. Invalid permission.';
 		}
 
 		if ( true === $this->required_login ) {
-			return esc_html__( 'Error. You are not logged in.', 'read-more-login' );
+			return 'Error. You are not logged in.';
 		}
 
 		if ( isset( $this->required_capabilities ) ) {
 			if ( ! current_user_can( $this->required_capabilities ) ) {
-				return esc_html__( 'Error. Access denied.', 'read-more-login' );
+				return 'Error. Access denied.';
 			}
 		}
 
-		return esc_html__( 'Undefined error.', 'read-more-login' );
+		return 'Undefined error.';
 	}
 
 	/**
