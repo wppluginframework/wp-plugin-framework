@@ -39,7 +39,7 @@ class Time_Stamp_Type extends Data_Type {
 
 	public function __construct( $metadata, $key, $value = null ) {
 		if ( ! isset( $metadata['db_field_type'] ) ) {
-			$metadata['db_field_type'] = 'TIMESTAMP';
+			$metadata['db_field_type'] = 'DATETIME';
 		}
 
 		if ( isset( $metadata['default_value'] ) ) {
