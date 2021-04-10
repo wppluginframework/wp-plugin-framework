@@ -152,3 +152,28 @@ div.wpf-color-picker div.wpf-color-show{
 div.wpf-color-picker input{
     display: inline-block;
 }
+
+div.wpf-controller-style table.wpf_list_view,
+div.wpf-controller-admin-style table.wpf_list_view
+{
+    border-spacing: 0;
+    border-collapse: collapse;
+    padding: 0;
+
+}
+
+div.wpf-controller-style table.wpf_list_view th,
+div.wpf-controller-admin-style table.wpf_list_view th
+{
+    border: 1px solid #cccccc;
+    padding: 3px;
+    background: #dcdcde;
+}
+
+div.wpf-controller-style table.wpf_list_view td,
+div.wpf-controller-admin-style table.wpf_list_view td
+{
+    border: 1px solid #cccccc;
+    padding: 3px;
+    background: white;
+}
