@@ -28,6 +28,7 @@ defined( 'ABSPATH' ) || exit;
 
 use WP_PluginFramework\Pages\Page;
 use WP_PluginFramework\HtmlElements\H;
+use WP_PluginFramework\Plugin_Container;
 
 /**
  * Summary.
@@ -40,6 +41,10 @@ class Admin_Page extends Page {
         $headline = $this->get_property('headline');
         if( ! $headline ) {
             $headline = get_admin_page_title();
+            $plugin_name = Plugin_Container::get_plugin_name();
+            if($plugin_name) {
+                $headline = $plugin_name . ' - ' . $headline;
+            }
         }
         $h = new H(1, $headline);
         $this->prepend_content($h);

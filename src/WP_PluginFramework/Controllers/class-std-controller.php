@@ -142,13 +142,13 @@ class Std_Controller extends Form_Controller {
 				$message = 'Error. Invalid input data.';
 			}
 
-			$this->view->status_bar_footer->set_status_text( $message, Status_Bar::STATUS_ERROR );
+			$this->view->std_status_bar->set_status_text( $message, Status_Bar::STATUS_ERROR );
 
 			foreach ( $ok_components as $component ) {
 				$component->hide_input_error_indication();
 			}
 		} else {
-			$this->view->status_bar_footer->set_status_text( 'Error. Invalid data.', Status_Bar::STATUS_ERROR );
+			$this->view->std_status_bar->set_status_text( 'Error. Invalid data.', Status_Bar::STATUS_ERROR );
 		}
 	}
 
@@ -169,7 +169,7 @@ class Std_Controller extends Form_Controller {
 	 * @param $data_record
 	 */
 	public function handle_save_success( $data_record ) {
-		$this->view->status_bar_footer->set_status_text( 'Your settings have been saved.', Status_Bar::STATUS_SUCCESS );
+		$this->view->std_status_bar->set_status_text( 'Your settings have been saved.', Status_Bar::STATUS_SUCCESS );
 	}
 
 	/**
@@ -178,6 +178,6 @@ class Std_Controller extends Form_Controller {
 	 * @param $data_record
 	 */
 	public function handle_save_errors( $data_record ) {
-		$this->view->status_bar_footer->set_status_text( 'Error saving data.', Status_Bar::STATUS_ERROR );
+		$this->view->std_status_bar->set_status_text( 'Error saving data.', Status_Bar::STATUS_ERROR );
 	}
 }

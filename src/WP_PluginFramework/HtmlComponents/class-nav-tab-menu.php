@@ -58,13 +58,12 @@ class Nav_Tab_Menu extends Html_Base_Component {
 	 * @param null $config
 	 */
 	public function create_content( $config = null ) {
-		foreach ( $this->nav_tabs as $nav_tab ) {
-			$attributes['href']  = $nav_tab['link'];
+		foreach ( $this->nav_tabs as $name => $nav_tab ) {
 			$attributes['class'] = 'nav-tab';
-			if ( $this->selected === $nav_tab['name'] ) {
+			if ( $this->selected === $name ) {
 				$attributes['class'] .= ' nav-tab-active';
 			}
-			$href = new A( $nav_tab['text'], $attributes );
+			$href = new A( $nav_tab['text'], $nav_tab['link'], $attributes );
 			$this->add_content( $href );
 		}
 	}

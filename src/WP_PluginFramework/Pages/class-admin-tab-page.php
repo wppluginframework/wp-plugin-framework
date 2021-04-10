@@ -26,6 +26,8 @@ namespace WP_PluginFramework\Pages;
 
 defined( 'ABSPATH' ) || exit;
 
+use WP_PluginFramework\HtmlComponents\Status_Bar;
+use WP_PluginFramework\HtmlElements\H;
 use WP_PluginFramework\Pages\Admin_Page;
 use WP_PluginFramework\HtmlComponents\Nav_Tab_Menu;
 
@@ -56,6 +58,16 @@ class Admin_Tab_Page extends Admin_Page {
     }
 
     public function create_content( $config = null ) {
+        if( isset( $this->nav_tabs[$this->my_tab_name]['headline'] ))
+        {
+            $headline = new H(1, $this->nav_tabs[$this->my_tab_name]['headline']);
+            $this->prepend_content($headline);
+        }
+
+        $this->admin_status_bar = new Status_Bar( Status_Bar::TYPE_REMOVABLE_BLOCK );
+        $this->admin_status_bar->set_id('admin_status_bar');
+        $this->prepend_content($this->admin_status_bar);
+
         if ( isset( $this->nav_tabs ) ) {
             $attributes['class'] = 'nav-tab-wrapper';
             $navtab              = new Nav_Tab_Menu( $this->nav_tabs, $this->my_tab_name, $attributes );
@@ -63,7 +75,6 @@ class Admin_Tab_Page extends Admin_Page {
         }
 
         parent::create_content( $config );
-
     }
 
 }

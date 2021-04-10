@@ -64,4 +64,30 @@ class Admin_Controller extends Std_Controller {
 	public function handle_save_errors( $data_record ) {
 		$this->view->admin_status_bar->set_status_text( 'Error saving data.', Status_Bar::STATUS_ERROR );
 	}
+
+    /**
+     * @param $input_name
+     */
+    protected function response_set_input_error( $input_name ) {
+        $error_input                = $this->get_server_context_data( 'error_input', array() );
+        $error_input[ $input_name ] = true;
+        $this->set_server_context_data( 'error_input', $error_input );
+    }
+
+    /**
+     *
+     */
+    protected function hide_input_error_indications() {
+        $this->view->hide_input_error_indications();
+    }
+
+    /**
+     *
+     */
+    protected function show_onput_error_indications() {
+        $error_inputs = $this->get_server_context_data( 'error_input' );
+        if ( $error_inputs ) {
+            $this->view->show_input_error_indications( $error_inputs );
+        }
+    }
 }
