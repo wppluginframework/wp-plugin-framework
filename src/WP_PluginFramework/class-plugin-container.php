@@ -164,23 +164,46 @@ class Plugin_Container {
 	protected function safe_create_controller() {
 		$controller_name = Security_Filter::safe_read_post_request( Controller::PROTECTED_DATA_CONTROLLER, Security_Filter::CLASS_NAME );
 
-		if ( $controller_name ) {
-			/* jQuery ajax post adds double slashes */
-			$controller_class = stripslashes( $controller_name );
+		if ( $controller_name )
+        {
+            /* jQuery ajax post adds double slashes */
+            $controller_class = stripslashes($controller_name);
 
-			$controller_class_data = explode( '\\', $controller_class );
-			if ( count( $controller_class_data ) === 2 ) {
-				if ( $controller_class_data[0] === self::$plugin_namespace ) {
-					if ( substr( $controller_class_data[1], -10 ) === 'Controller' ) {
-						$safe_controller_class = $controller_class_data[0] . '\\' . $controller_class_data[1];
-						if ( class_exists( $safe_controller_class ) ) {
-							$controller = new $safe_controller_class();
-							return $controller;
-						}
-					}
-				}
-			}
-		}
+            $controller_class_data = explode('\\', $controller_class);
+            if (count($controller_class_data) === 2)
+            {
+                if ($controller_class_data[0] === self::$plugin_namespace)
+                {
+                    if (substr($controller_class_data[1], -10) === 'Controller')
+                    {
+                        $safe_controller_class = $controller_class_data[0] . '\\' . $controller_class_data[1];
+                        if (class_exists($safe_controller_class))
+                        {
+                            $controller = new $safe_controller_class();
+                            return $controller;
+                        }
+                    }
+                }
+            }
+            elseif (count($controller_class_data) === 3)
+            {
+                if ($controller_class_data[0] === self::$wp_framework_namespace)
+                {
+                    if ($controller_class_data[1] === 'Controllers')
+                    {
+                        if (substr($controller_class_data[2], -10) === 'Controller')
+                        {
+                            $safe_controller_class = $controller_class_data[0] . '\\' . $controller_class_data[1] . '\\' . $controller_class_data[2];
+                            if (class_exists($safe_controller_class))
+                            {
+                                $controller = new $safe_controller_class();
+                                return $controller;
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
 		/* Don't flood the debug log due to hacking attempt. Write to buffer until nonce confirmed. */
 		Debug_Logger::pause_wp_debug_logging();
@@ -384,6 +407,10 @@ class Plugin_Container {
 							$model = new $class_name();
 							$model->create();
 						}
+						else
+						{
+                            Debug_Logger::write_debug_error( 'No class ' . $class_name . ' found in ' . $filename . '.' );
+                        }
 					}
 				}
 			}
