@@ -57,7 +57,7 @@ abstract class Controller {
 	const PROTECTED_DATA_VIEW             = '_view';
 
 	/* Received data from client side, nonce protected. */
-	private $nonce_protected_data = array(
+	protected $nonce_protected_data = array(
 		self::PROTECTED_DATA_WP_NONCE         => null,
 		self::PROTECTED_DATA_CONTROLLER       => null,
 		self::PROTECTED_DATA_PROXY_CONTROLLER => null,
@@ -621,6 +621,8 @@ abstract class Controller {
 	 * @param $values
 	 */
 	protected function init_view( $values ) {
+        $this->create_wp_nonce();
+
 		if ( isset( $this->init_function ) ) {
 			$this->view->add_hidden_fields( '_init_callback', $this->init_function );
 		}
@@ -911,11 +913,6 @@ abstract class Controller {
 	 */
 	protected function draw_view( $parameters = null ) {
 		$this->enqueue_script();
-
-		$this->create_wp_nonce();
-		foreach ( $this->nonce_protected_data as $name => $protected_data ) {
-			$this->view->add_hidden_fields( $name, $protected_data );
-		}
 
 		return $this->view->draw_view( $parameters );
 	}

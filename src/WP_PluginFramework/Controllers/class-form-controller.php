@@ -45,4 +45,12 @@ class Form_Controller extends Controller {
 	}
 
     public function create_content() {}
+
+    protected function draw_view( $parameters = null ) {
+        foreach ( $this->nonce_protected_data as $name => $protected_data ) {
+            $this->view->add_hidden_fields( $name, $protected_data );
+        }
+
+        return parent::draw_view( $parameters );
+    }
 }

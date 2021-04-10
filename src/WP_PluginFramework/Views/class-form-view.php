@@ -47,7 +47,7 @@ class Form_View extends View {
 
 	private $method = 'ajax';
 
-	protected $hidden_fields         = array();
+	protected $hidden_fields = array();
     protected $pre_form_contents = array();
     protected $post_form_contents = array();
 
