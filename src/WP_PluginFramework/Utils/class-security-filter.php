@@ -67,7 +67,7 @@ class Security_Filter {
 		return null;
 	}
 
-	public static function aanitize_alpha_text( $text ) {
+	public static function sanitize_alpha_text( $text ) {
 		if ( $text === '' ) {
 			return '';
 		} else {
@@ -181,7 +181,7 @@ class Security_Filter {
 				break;
 
 			case self::ALPHA:
-				return self::aanitize_alpha_text( $unfiltered );
+				return self::sanitize_alpha_text( $unfiltered );
 				break;
 
 			case 'integer':
