@@ -63,10 +63,10 @@ abstract class Active_Record extends Model {
 	 *
 	 * @return bool|int|void
 	 */
-	protected function load_data_record( $conditions ) {
+	protected function load_data_record( $conditions, $query_parameters=null ) {
 		$records_loaded = false;
 
-		$db_data_list = $this->database->read( $this->model_name, '*', $conditions );
+		$db_data_list = $this->database->read( $this->model_name, '*', $conditions, $query_parameters );
 		if ( $db_data_list ) {
 			$records_loaded = count( $db_data_list );
 			for ( $i = 0; $i < $records_loaded; $i++ ) {

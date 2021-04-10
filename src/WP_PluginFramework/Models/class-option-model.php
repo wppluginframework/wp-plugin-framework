@@ -64,7 +64,7 @@ class Option_Model extends Model {
 	 *
 	 * @return bool|int
 	 */
-	protected function load_data_record( $condition ) {
+	protected function load_data_record( $condition, $query_parameters=null  ) {
 		$data_record = get_option( $this->model_name );
 
 		if ( false !== $data_record ) {

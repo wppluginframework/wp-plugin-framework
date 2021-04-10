@@ -76,7 +76,7 @@ abstract class Model extends Base_Object {
 	 * @return false    Model data/table/option don't exist or has never been created.
 	 * @return integer  Number of data records loaded.
 	 */
-	abstract protected function load_data_record( $condition);
+	abstract protected function load_data_record( $condition, $query_parameters=null );
 
 	abstract public function load_column( $field_name_list);
 	abstract protected function save_data_index( $index);
@@ -660,11 +660,18 @@ abstract class Model extends Base_Object {
 		return $this->load_more_data( $conditions );
 	}
 
+    public function load_data_query_parameters( $query_parameters=null ) {
+        $conditions   = null;
+        $this->clear_all_data();
+        return $this->load_more_data( $conditions, $query_parameters );
+    }
+
 	public function load_all_data() {
 		$this->clear_all_data();
 		$condition      = null;
-		$records_loaded = $this->load_data_record( $condition );
+		$records_loaded = $this->load_data_record( $condition, $query_parameters=null  );
 
+		/* TODO WTF??? why set touch false */
 		if ( $records_loaded ) {
 			for ( $index = 0; $index < $records_loaded; $index ++ ) {
 				$this->touched_data[] = false;
@@ -674,7 +681,15 @@ abstract class Model extends Base_Object {
 		return $records_loaded;
 	}
 
-	public function load_more_data( $conditions ) {
+	public function load_more_data( $conditions, $query_parameters=null ) {
+	    if(isset($query_parameters)) {
+            $meta_data_list = $this->get_meta_data_list();
+            $invalid_keys = $query_parameters->filter_data($meta_data_list);
+            if(!empty($invalid_keys)) {
+                Debug_Logger::write_debug_error('Invalid keys in database request.', $invalid_keys);
+            }
+        }
+
 		if ( isset( $conditions ) ) {
 			foreach ( $conditions as $condition ) {
 				$where_field = $condition['field'];
@@ -685,7 +700,7 @@ abstract class Model extends Base_Object {
 			}
 		}
 
-		return $this->load_data_record( $conditions );
+		return $this->load_data_record( $conditions, $query_parameters );
 	}
 
 	public function save_data() {

@@ -35,12 +35,21 @@ use WP_PluginFramework\Utils\Debug_Logger;
  */
 class Wp_Db_Interface {
 
-	const WHERE_EQUAL         = '=';
-	const WHERE_NOT_EQUAL     = '!=';
-	const WHERE_GREATER       = '>';
-	const WHERE_GREATER_EQUAL = '>=';
-	const WHERE_LESS          = '<';
-	const WHERE_LESS_EQUAL    = '<=';
+	const WHERE_EQUAL         = 'equal';
+	const WHERE_NOT_EQUAL     = 'not equal';
+	const WHERE_GREATER       = 'grater';
+	const WHERE_GREATER_EQUAL = 'grater_equal';
+	const WHERE_LESS          = 'less';
+	const WHERE_LESS_EQUAL    = 'less_equal';
+
+	private $where_symbols = array(
+	    self::WHERE_EQUAL => '=',
+        self::WHERE_NOT_EQUAL => '!=',
+        self::WHERE_GREATER => '>',
+        self::WHERE_GREATER_EQUAL => '>=',
+        self::WHERE_LESS => '<',
+        self::WHERE_LESS_EQUAL => '<=',
+    );
 
 	private $prepare_error     = false;
 	private $last_query_result = null;
@@ -59,23 +68,82 @@ class Wp_Db_Interface {
 	 *
 	 * @return null
 	 */
-	public function read( $table_name, $select_columns, $where = null ) {
-		$safe_prefixed_table_name = $this->prepare_table_name( $table_name );
-		$safe_select_columns      = $this->prepare_sql_select( $select_columns );
+	public function read( $table_name, $select_columns, $where = null, $query_parameters=null ) {
+        $safe_prefixed_table_name = $this->prepare_table_name($table_name);
 
-		$sql = 'SELECT ' . $safe_select_columns . ' FROM `' . $safe_prefixed_table_name . '`';
+        if (isset($query_parameters)) {
+            $select_columns = $query_parameters->get_fields();
+            if (!empty($select_columns)) {
+                $safe_select_columns = $this->prepare_sql_select($select_columns);
+            }
+            else {
+                $safe_select_columns = '*';
+            }
 
-		if ( isset( $where ) ) {
-			$safe_where = $this->prepare_sql_where( $where );
-			$sql       .= ' WHERE ' . $safe_where;
-		}
+            $sql = 'SELECT ' . $safe_select_columns . ' FROM `' . $safe_prefixed_table_name . '`';
 
-		if ( $this->query_get_result( $sql ) ) {
-			return $this->last_query_result;
-		} else {
-			return null;
-		}
-	}
+            $safe_where = false;
+            $where_columns = $query_parameters->get_filters();
+            if(!empty($where_columns)) {
+                $safe_where =  $this->prepare_sql_where($where_columns);
+            }
+
+            $safe_search = false;
+            $search_columns = $query_parameters->get_search();
+            if( !empty($search_columns)) {
+                $safe_search =  $this->prepare_sql_search($search_columns);
+            }
+
+            if(($safe_where !== false) or ($safe_search !== false)) {
+                $sql .= ' WHERE ';
+
+                if ($safe_where !== false) {
+                    $sql .= $safe_where;
+                }
+
+                if ($safe_search !== false) {
+                    if ($safe_where !== false) {
+                        $sql .= ' AND ';
+                    }
+                    $sql .= $safe_search;
+                }
+            }
+
+            $orders = $query_parameters->get_orders();
+            if(!empty($orders)) {
+                $safe_orders = $this->prepare_sql_orders($orders);
+                if($safe_orders !== false) {
+                    $sql .= ' ORDER BY ' . $safe_orders;
+                }
+            }
+
+            $limit = $query_parameters->get_limit();
+            if(!isset($limit)) {
+                $limit = 1000;
+            }
+            $sql .= ' LIMIT ' . strval($limit);
+
+            $offset = $query_parameters->get_offset();
+            if(isset($offset)) {
+                $sql .= ' OFFSET ' . strval($offset);
+            }
+        }
+        else {
+            $safe_select_columns = $this->prepare_sql_select($select_columns);
+            $sql = 'SELECT ' . $safe_select_columns . ' FROM `' . $safe_prefixed_table_name . '`';
+            if (isset($where)) {
+                $safe_where = $this->prepare_sql_where($where);
+                $sql .= ' WHERE ' . $safe_where;
+            }
+        }
+
+        if ($this->query_get_result($sql)) {
+            return $this->last_query_result;
+        }
+        else {
+            return null;
+        }
+    }
 
 	/**
 	 * Summary.
@@ -480,58 +548,99 @@ class Wp_Db_Interface {
 	 *
 	 * @return array|string|null
 	 */
-	private function prepare_sql_where( $where, $to_string = true ) {
-		$where_str = '';
+	private function prepare_sql_orders($orders ) {
+        $safe_string = false;
 
-		$safe_where = $this->prepare_key_value( $where, true, 2 );
+		$safe_order = $this->prepare_key_value( $orders, true, 2 );
 
-		if ( $to_string ) {
-			if ( $safe_where ) {
-				$more_than_one_where = false;
-				$defined_comparators = array(
-					self::WHERE_EQUAL,
-					self::WHERE_NOT_EQUAL,
-					self::WHERE_GREATER,
-					self::WHERE_GREATER_EQUAL,
-					self::WHERE_LESS,
-					self::WHERE_LESS_EQUAL,
-				);
+        foreach($safe_order as $field => $direction) {
+            if (is_array($direction)) {
+                /* TODO add code here */
+            }
+            else {
+                $direction = strtoupper($direction);
+                if ($direction === 'ASC' or $direction === 'DESC') {
+                    if($safe_string !== false) {
+                        $safe_string .= ', ';
+                    }
+                    $safe_string .= '`' . $field . '` ' . $direction;
+                }
+            }
+        }
 
-				foreach ( $safe_where as $safe_key => $safe_where_item ) {
-					if ( is_array( $safe_where_item ) ) {
-						$where_field = $safe_where_item['field'];
-						$where_value = $safe_where_item['value'];
-					} else {
-						$where_field = $safe_key;
-						$where_value = $safe_where_item;
-					}
-
-					if ( isset( $safe_where_item['comparator'] ) ) {
-						if ( in_array( $safe_where_item['comparator'], $defined_comparators, true ) ) {
-							$comparator = $safe_where_item['comparator'];
-						} else {
-							Debug_Logger::write_debug_error( 'Invalid comparator "' . $safe_where_item['comparator'] . '"' );
-							$this->prepare_error = true;
-							return null;
-						}
-					} else {
-						$comparator = '=';
-					}
-
-					if ( $more_than_one_where ) {
-						$where_str .= ' AND ';
-					}
-
-					$where_str .= '`' . $where_field . '`' . $comparator . "'" . $where_value . "'";
-
-					$more_than_one_where = true;
-				}
-			}
-			return $where_str;
-		} else {
-			return $safe_where;
-		}
+    	return $safe_string;
 	}
+
+    private function prepare_sql_search( $search ) {
+        $safe_search = false;
+
+        foreach($search as $field => $search_word) {
+            $safe_field = $this->prepare_key_value( $field, true);
+
+            $safe_search_word = $this->prepare_data_value( $search_word, true);
+
+            if(!(($safe_field === false) or ($safe_search_word === false))) {
+                if ($safe_search !== false) {
+                    $safe_search .= ' AND ';
+                }
+                $safe_search_word = str_replace('*', '%', $safe_search_word);
+                $safe_search .= "`" . $safe_field . "` LIKE '" . $safe_search_word . "'";
+            }
+        }
+
+        return $safe_search;
+    }
+
+    private function prepare_sql_where( $where ) {
+        $where_str = '';
+
+        $safe_where = $this->prepare_key_value( $where, true, 2 );
+
+        if ( $safe_where ) {
+            $more_than_one_where = false;
+            $defined_comparators = array(
+                self::WHERE_EQUAL,
+                self::WHERE_NOT_EQUAL,
+                self::WHERE_GREATER,
+                self::WHERE_GREATER_EQUAL,
+                self::WHERE_LESS,
+                self::WHERE_LESS_EQUAL,
+            );
+
+            foreach ( $safe_where as $safe_key => $safe_where_item ) {
+                if ( is_array( $safe_where_item ) ) {
+                    $where_field = $safe_where_item['field'];
+                    $where_value = $safe_where_item['value'];
+                } else {
+                    $where_field = $safe_key;
+                    $where_value = $safe_where_item;
+                }
+
+                if ( isset( $safe_where_item['comparator'] ) ) {
+                    if ( in_array( $safe_where_item['comparator'], $defined_comparators, true ) ) {
+                        $comparator_name = $safe_where_item['comparator'];
+                        $comparator = $this->where_symbols[$comparator_name];
+                    } else {
+                        Debug_Logger::write_debug_error( 'Invalid comparator "' . $safe_where_item['comparator'] . '"' );
+                        $this->prepare_error = true;
+                        return null;
+                    }
+                } else {
+                    $comparator = '=';
+                }
+
+                if ( $more_than_one_where ) {
+                    $where_str .= ' AND ';
+                }
+
+                $where_str .= '`' . $where_field . '`' . $comparator . "'" . $where_value . "'";
+
+                $more_than_one_where = true;
+            }
+        }
+
+        return $where_str;
+    }
 
 	/**
 	 * Summary.
