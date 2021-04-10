@@ -48,6 +48,8 @@ class Form_View extends View {
 	private $method = 'ajax';
 
 	protected $hidden_fields         = array();
+    protected $pre_form_contents = array();
+    protected $post_form_contents = array();
 
 	public function set_method( $method ) {
 		$this->method = $method;
@@ -60,6 +62,32 @@ class Form_View extends View {
 		);
 		$this->hidden_fields[] = $attributes;
 	}
+
+    public function add_pre_form_content( $content, $config = null ) {
+        $content = $this->prepare_create_content($content, $config);
+
+        switch ( gettype( $content ) ) {
+            case 'array':
+                $this->pre_form_contents = array_merge( $this->pre_form_contents, $content );
+                break;
+
+            default:
+                array_push( $this->pre_form_contents, $content );
+        }
+    }
+
+    public function add_post_form_content( $content, $config = null ) {
+        $content = $this->prepare_create_content($content, $config);
+
+        switch ( gettype( $content ) ) {
+            case 'array':
+                $this->post_form_contents = array_merge( $this->post_form_contents, $content );
+                break;
+
+            default:
+                array_push( $this->post_form_contents, $content );
+        }
+    }
 
 	public function create_content( $parameters = null ) {
 		if ( $this->show_form ) {
