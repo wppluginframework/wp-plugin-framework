@@ -119,7 +119,7 @@ class Plugin_Container {
 			$class_name2 = strtolower( $class_name2 );
 
 			foreach ( self::$auto_loader_includes as $include ) {
-				$filename = plugin_dir_path( self::$plugin_base_file_path ) . '/' . $include . '/class-' . str_replace( '\\', '/', $class_name2 ) . '.php';
+				$filename = plugin_dir_path( self::$plugin_base_file_path ) . 'src/' . $include . '/class-' . str_replace( '\\', '/', $class_name2 ) . '.php';
 				if ( file_exists( $filename ) ) {
 					include $filename;
 					if ( class_exists( $class_name ) ) {
@@ -145,7 +145,7 @@ class Plugin_Container {
 	}
 
 	public function plugin_loaded() {
-		$language_path = $this->get_plugin_slug() . '/languages/';
+		$language_path = $this->get_plugin_slug() . '/asset/languages/';
 		load_plugin_textdomain( self::$plugin_data['TextDomain'], false, $language_path );
 
 		$plugin_version_data_installed = $this->get_existing_db_version_data();
@@ -317,7 +317,7 @@ class Plugin_Container {
 
 		Debug_Logger::write_debug_note( 'Activating ' . $plugin_slug . ' version ' . $plugin_version_name . '.' );
 
-		$language_path = static::get_plugin_slug() . '/languages/';
+		$language_path = static::get_plugin_slug() . '/asset/languages/';
 		load_plugin_textdomain( self::$plugin_data['TextDomain'], false, $language_path );
 
 		$previous_plugin = static::upgrade_version_info( $plugin_version_data, Version_Info::PLUGIN_INSTALL_STATE_ACTIVATED );
