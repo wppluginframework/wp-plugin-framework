@@ -20,14 +20,6 @@
     "phpcompatibility/phpcompatibility-wp": "*",
     "wp-coding-standards/wpcs": "*"
   },
-  "scripts": {
-    "phpcs": [
-      "C:/sandbox/htdocs/plugins/read-more-login/vendor/bin/phpcs --standard=phpcs.ruleset.xml"
-    ],
-    "phpcbf": [
-      "C:/sandbox/htdocs/plugins/read-more-login/vendor/bin/phpcbf  --standard=phpcs.ruleset.xml"
-    ]
-  },
   "autoload": {
     "psr-4": {"WP_PluginFramework\\": "src/"}
   }
