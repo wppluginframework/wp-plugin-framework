@@ -75,7 +75,7 @@ abstract class Controller {
 	protected $registered_events         = array();
 
 	private $required_capabilities = null;
-	private $required_login        = null;
+	private $required_login        = false;
 
 	protected $id = null;
 
