@@ -45,6 +45,7 @@ class Security_Filter {
 	const WP_PASSWORD           = 'wp_password';
 	const EMAIL                 = 'email';
 	const CLASS_NAME            = 'class_name';
+    const URL                   = 'url';
 
 	public static function sanitize_text( $text ) {
 		if ( preg_match( '/^[A-Za-z0-9 .,;:+=?_~\/\-!@#\$%\^&\*\(\)]+$/', $text ) ) {
@@ -166,6 +167,10 @@ class Security_Filter {
 			case self::EMAIL:
 				return self::sanitize_text( $unfiltered );
 				break;
+
+            case self::URL:
+                return self::sanitize_text( $unfiltered );
+                break;
 
 			case self::STRING_KEY_NAME:
 				return self::sanitize_key_name_text( $unfiltered );
