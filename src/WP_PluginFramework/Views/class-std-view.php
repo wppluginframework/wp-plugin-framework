@@ -33,10 +33,12 @@ use WP_PluginFramework\HtmlComponents\Push_Button;
 use WP_PluginFramework\HtmlComponents\Status_Bar;
 use WP_PluginFramework\HtmlElements\H;
 use WP_PluginFramework\HtmlElements\Hr;
+use WP_PluginFramework\HtmlElements\Label;
 use WP_PluginFramework\HtmlElements\P;
 use WP_PluginFramework\HtmlElements\Table;
 use WP_PluginFramework\HtmlElements\Tbody;
 use WP_PluginFramework\HtmlElements\Td;
+use WP_PluginFramework\HtmlElements\Th;
 use WP_PluginFramework\HtmlElements\Tr;
 use WP_PluginFramework\Utils\Debug_Logger;
 
@@ -55,6 +57,9 @@ class Std_View extends Form_View {
 	protected $content_config        = array();
 	protected $form_table_tr_wrapper = null;
 
+    /** @var Status_Bar */
+    public $std_status_bar;
+
 	/**
 	 * Construction.
 	 *
@@ -62,21 +67,34 @@ class Std_View extends Form_View {
 	 * @param $controller
 	 * @param array      $attributes
 	 */
-	public function __construct( $id, $controller, $attributes = array() ) {
-		parent::__construct( $controller, $attributes );
+	public function __construct( $id, $controller, $model = null ) {
 
-		$this->id      = $id;
 		$this->form_id = $id;
 
-		$this->div_wrapper                                  = array( 'class' => 'wpf-controller' );
-		$this->content_config['form_input_encapsulation']   = 'table';
-		$this->content_config['form_input_width']           = '400px';
-		$this->content_config['form_input_layout']          = 'single_column_table';
-		$this->content_config['form_placeholder_table_attr']= array( 'class' => 'wpf-table-placeholder' );
-		$this->content_config['form_placeholder_tbody_attr']= array( 'class' => 'wpf-table-placeholder' );
-		$this->content_config['form_placeholder_tr_attr']   = array( 'class' => 'wpf-table-placeholder' );
-		$this->content_config['form_placeholder_th_attr']   = array( 'class' => 'wpf-table-placeholder-input' );
-		$this->content_config['form_placeholder_td_attr']   = array( 'class' => 'wpf-table-placeholder-input' );
+        if(is_admin()) {
+            $this->content_config['form_input_layout']           = 'double_column_table';
+            $this->content_config['form_placeholder_table_attr'] = array( 'class' => 'form-table' );
+            $this->content_config['form_placeholder_tbody_attr'] = array( 'class' => 'wpf-table-placeholder' );
+            $this->content_config['form_placeholder_tr_attr']    = null;
+            $this->content_config['form_placeholder_th_attr']    = array( 'class' => 'row' );
+            $this->content_config['form_placeholder_td_attr']    = null;
+            $this->content_config['form_input_encapsulation'] = null;
+            $this->content_config['form_input_width'] = '100%';
+        }	else {
+            $this->div_wrapper                                  = array( 'class' => 'wpf-controller' );
+            $this->content_config['form_input_encapsulation']   = 'table';
+            $this->content_config['form_input_width']           = '400px';
+            $this->content_config['form_input_layout']          = 'single_column_table';
+            $this->content_config['form_placeholder_table_attr']= array( 'class' => 'wpf-table-placeholder' );
+            $this->content_config['form_placeholder_tbody_attr']= array( 'class' => 'wpf-table-placeholder' );
+            $this->content_config['form_placeholder_tr_attr']   = array( 'class' => 'wpf-table-placeholder' );
+            $this->content_config['form_placeholder_th_attr']   = array( 'class' => 'wpf-table-placeholder-input' );
+            $this->content_config['form_placeholder_td_attr']   = array( 'class' => 'wpf-table-placeholder-input' );
+        }
+
+        $this->std_status_bar = new Status_Bar(Status_Bar::TYPE_REMOVABLE_BLOCK);
+
+        parent::__construct( $id, $controller );
 	}
 
 	public function add_header( $id, $component ) {
@@ -87,15 +105,23 @@ class Std_View extends Form_View {
 	 * @param $id
 	 * @param $component Html_Base_Component
 	 */
-	public function add_form_input( $id, $component ) {
-		$this->form_inputs[ $id ] = $component;
-
-		/* If no name is set for a form input, use the id as name*/
-		if ( $this->form_inputs[ $id ]->get_property( 'name' ) === null ) {
-			$this->form_inputs[ $id ]->set_property( 'name', $id );
-		}
-
-		$component->set_form_id( $this->form_id );
+	public function add_form_input( $name, $component, $label=null, $description=null, $category=null ) {
+	    if(!isset($label)){
+	        $label = $component->get_property('label');
+        }
+        if(!isset($description)){
+            $description = $component->get_property('description');
+        }
+        if(!isset($category)){
+            $category = $component->get_property('category');
+        }
+	    $form_input  =array(
+	        'component' => $component,
+            'label' => $label,
+            'description' => $description,
+            'category' => $category
+        );
+		array_push($this->form_inputs, $form_input);
 	}
 
 	public function get_form_input_component( $name = null ) {
@@ -214,6 +240,30 @@ class Std_View extends Form_View {
 		}
 	}
 
+	public function create_input_form_content( $form_input, $content_config ){
+        $name = $form_input['component']->get_id();
+        $td_label = new Th(null, array(
+            'class' => 'wpf-table-placeholder-input row',
+        ));
+        if ( isset( $form_input['label'])) {
+            $label = new Label($form_input['label'], array('for' => $name));
+            $td_label->add_content( $label );
+        }
+
+        $td_input = new Td(null, array('class' => 'wpf-table-placeholder-input'));
+        if ( isset( $form_input['component'] ) ) {
+            $td_input->add_content( $form_input['component'], $content_config );
+        }
+        if ( isset( $form_input['description'] )) {
+            $p = new P($form_input['description'], array('class' => 'wpf-table-input-description'));
+            $td_input->add_content( $p );
+        }
+
+        $tr = new Tr($td_label);
+        $tr->add_content($td_input);
+        return $tr;
+    }
+
 	public function create_content( $parameters = null ) {
 		if ( isset( $this->headers ) ) {
 			foreach ( $this->headers as $header ) {
@@ -228,103 +278,108 @@ class Std_View extends Form_View {
 			}
 		}
 
-		if ( isset( $this->content_config['form_input_encapsulation'] ) && ( $this->content_config['form_input_encapsulation'] ) === 'table' ) {
-			$td_form_attr          = $this->content_config['form_placeholder_td_attr'];
-			$td_form_attr['width'] = $this->content_config['form_input_width'];
+        if( ($this->form_inputs) or ($this->buttons ))
+        {
+            if (isset($this->content_config['form_input_encapsulation']) && ($this->content_config['form_input_encapsulation']) === 'table')
+            {
+                $td_form_attr = $this->content_config['form_placeholder_td_attr'];
+                $td_form_attr['width'] = $this->content_config['form_input_width'];
 
-			$td_form                     = new Td( null, $td_form_attr );
-			$td_spacing                  = new Td( null, $this->content_config['form_placeholder_td_attr'] );
-			$this->form_table_tr_wrapper = new Tr( $td_form, $this->content_config['form_placeholder_tr_attr'] );
-			$this->form_table_tr_wrapper->add_content( $td_spacing );
-			$tbody_wrapper = new Tbody( $this->form_table_tr_wrapper, $this->content_config['form_placeholder_tbody_attr'] );
-			$table_wrapper = new Table($tbody_wrapper, $this->content_config['form_placeholder_table_attr']);
-			$this->add_content( $table_wrapper );
-		} else {
-			$td_form = $this;
-		}
+                $td_form = new Td(null, $td_form_attr);
+                $td_spacing = new Td(null, $this->content_config['form_placeholder_td_attr']);
+                $this->form_table_tr_wrapper = new Tr($td_form, $this->content_config['form_placeholder_tr_attr']);
+                $this->form_table_tr_wrapper->add_content($td_spacing);
+                $tbody_wrapper = new Tbody($this->form_table_tr_wrapper, $this->content_config['form_placeholder_tbody_attr']);
+                $table_wrapper = new Table($tbody_wrapper, $this->content_config['form_placeholder_table_attr']);
+                $this->add_content($table_wrapper);
+            }
+            else
+            {
+                $td_form = $this;
+            }
 
-		if ( isset( $parameters ) ) {
-			foreach ( $this->form_inputs as $component ) {
-				if ( isset( $component ) ) {
-					if ( isset( $component->name ) ) {
-						$name = $component->name;
-						if ( isset( $parameters[ $name ] ) ) {
-							$component->set_value( $parameters[ $name ] );
-						}
-					}
-				}
-			}
-		}
+            if ( isset( $parameters ) ) {
+                foreach ( $this->form_inputs as $component ) {
+                    if ( isset( $component ) ) {
+                        if ( isset( $component->name ) ) {
+                            $name = $component->name;
+                            if ( isset( $parameters[ $name ] ) ) {
+                                $component->set_value( $parameters[ $name ] );
+                            }
+                        }
+                    }
+                }
+            }
 
-		if ( empty( $this->input_form_categories ) ) {
-			$tbody = new TBody( null, $this->content_config['form_placeholder_tbody_attr'] );
-			foreach ( $this->form_inputs as $component ) {
-				if ( isset( $component ) ) {
-					$tbody->add_content( $component, $this->content_config );
-				}
-			}
-			$table = new Table($tbody, $this->content_config['form_placeholder_table_attr']);
-			$td_form->add_content( $table );
+            if ( empty( $this->input_form_categories ) ) {
+                $tbody = new TBody( null, $this->content_config['form_placeholder_tbody_attr'] );
+                foreach ( $this->form_inputs as $form_input ) {
+                    $tr = $this->create_input_form_content( $form_input, $this->content_config );
+                    $tbody->add_content($tr);
+                }
+                $table = new Table($tbody, $this->content_config['form_placeholder_table_attr']);
+                $td_form->add_content( $table );
 
-			if ( isset( $this->buttons ) ) {
-				$first_button     = true;
-				$button_paragraph = new P( null, array( 'class' => 'wpf-table-placeholder submit' ) );
-				foreach ( $this->buttons as $button ) {
-					if ( isset( $button ) ) {
-						if ( ! $first_button ) {
-							$button_paragraph->add_content( '&nbsp;&nbsp;' );
-						}
-						$first_button = false;
+                if ( isset( $this->buttons ) ) {
+                    $first_button     = true;
+                    $button_paragraph = new P( null, array( 'class' => 'wpf-table-placeholder submit' ) );
+                    foreach ( $this->buttons as $button ) {
+                        if ( isset( $button ) ) {
+                            if ( ! $first_button ) {
+                                $button_paragraph->add_content( '&nbsp;&nbsp;' );
+                            }
+                            $first_button = false;
 
-						$button_paragraph->add_content( $button, $this->content_config );
-					}
-				}
-				$td_form->add_content( $button_paragraph );
-			}
-		} else {
-			$first_category = true;
-			foreach ( $this->input_form_categories as $category ) {
-				if ( false === $first_category ) {
-					$divider = new Hr();
-					$td_form->add_content( $divider );
-				}
-				$first_category = false;
+                            $button_paragraph->add_content( $button, $this->content_config );
+                        }
+                    }
+                    $td_form->add_content( $button_paragraph );
+                }
+            } else {
+                $first_category = true;
+                foreach ( $this->input_form_categories as $category ) {
+                    if ( false === $first_category ) {
+                        $divider = new Hr();
+                        $td_form->add_content( $divider );
+                    }
+                    $first_category = false;
 
-				$header = new H( 2, $category['header'] );
-				$td_form->add_content( $header );
-				if ( isset( $category['description'] ) ) {
-					$description = new P( $category['description'] );
-					$td_form->add_content( $description );
-				}
+                    $header = new H( 2, $category['header'] );
+                    $td_form->add_content( $header );
+                    if ( isset( $category['description'] ) ) {
+                        $description = new P( $category['description'] );
+                        $td_form->add_content( $description );
+                    }
 
-				$tbody = new Tbody( null, $this->content_config['form_placeholder_tbody_attr'] );
-				foreach ( $this->form_inputs as $component ) {
-					if ( isset( $component ) ) {
-						if ( isset( $component->category ) && ( $component->category === $category['name'] ) ) {
-							$tbody->add_content( $component, $this->content_config );
-						}
-					}
-				}
-				$table = new Table($tbody, $this->content_config['form_placeholder_table_attr']);
-				$td_form->add_content( $table );
+                    $tbody = new Tbody( null, $this->content_config['form_placeholder_tbody_attr'] );
+                    foreach ( $this->form_inputs as $form_input ) {
+                        if ( isset( $form_input['category'] ) && ( $form_input['category'] === $category['name'] ) ) {
+                            $tr = $this->create_input_form_content( $form_input, $this->content_config );
+                            $tbody->add_content($tr);
+                        }
+                    }
+                    $table = new Table($tbody, $this->content_config['form_placeholder_table_attr']);
+                    $td_form->add_content( $table );
 
-				if ( isset( $this->buttons ) ) {
-					$first_button     = true;
-					$button_paragraph = new P( null, array( 'class' => 'submit' ) );
-					foreach ( $this->buttons as $button ) {
-						if ( isset( $button ) ) {
-							if ( ! $first_button ) {
-								$button_paragraph->add_content( '&nbsp;&nbsp;' );
-							}
-							$first_button = false;
+                    if ( isset( $this->buttons ) ) {
+                        $first_button     = true;
+                        $button_paragraph = new P( null, array( 'class' => 'submit' ) );
+                        foreach ( $this->buttons as $button ) {
+                            if ( isset( $button ) ) {
+                                if ( ! $first_button ) {
+                                    $button_paragraph->add_content( '&nbsp;&nbsp;' );
+                                }
+                                $first_button = false;
 
-							$button_paragraph->add_content( $button, $this->content_config );
-						}
-					}
-					$td_form->add_content( $button_paragraph );
-				}
-			}
-		}
+                                $button_paragraph->add_content( $button, $this->content_config );
+                            }
+                        }
+                        $td_form->add_content( $button_paragraph );
+                    }
+                }
+            }
+        }
+
 
 		if ( isset( $this->footers ) ) {
 

@@ -50,6 +50,24 @@ abstract class Html_Base_Component extends Html_Base_Element {
 		parent::__construct( $tag, $end_tag, $content, $attributes, $properties );
 	}
 
+    /**
+     * Summary.
+     *
+     * @param $name
+     */
+    public function set_id( $id ) {
+        $this->id  = $id;
+    }
+
+    /**
+     * Summary.
+     *
+     * @return |null
+     */
+    public function get_id() {
+        return  $this->id;
+    }
+
 	public function pick_client_side_value( $client_side_values ) {
 		return null;
 	}

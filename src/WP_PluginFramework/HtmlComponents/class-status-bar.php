@@ -73,6 +73,11 @@ class Status_Bar extends Html_Base_Component {
 		parent::__construct( $attributes, $properties, null, 'div', true );
 	}
 
+    public function set_id( $id ) {
+        $this->set_attribute('id', $id);
+        parent::set_id( $id);
+    }
+
 	/**
 	 * Summary.
 	 *
@@ -101,9 +106,8 @@ class Status_Bar extends Html_Base_Component {
 		$this->text   = $text;
 		$this->status = $status;
 
-		if (isset($this->attributes['id'])) {
-			$id       = $this->attributes['id'];
-			$selector = 'div#' . $id;
+		if (isset($this->id)) {
+			$selector = 'div#' . $this->id;
 			$bar      = $this->create_html_bar( $text, $status );
 			$html     = $bar->draw_html();
 

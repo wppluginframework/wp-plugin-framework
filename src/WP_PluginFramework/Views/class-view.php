@@ -52,8 +52,19 @@ abstract class View extends Html_Base_Element {
 	 * @param null       $content
 	 * @param null       $attributes
 	 */
-	public function __construct( $controller, $content = null, $attributes = null ) {
-		parent::__construct( null, null, $content, $attributes );
+	public function __construct( $id, $controller, $model = null ) {
+        $detected_components = $this->get_html_components();
+        foreach ( $detected_components as $component_id => $component )
+        {
+            if( ! isset( $this->components[$component_id] )) {
+                $component->set_id($component_id);
+                $component->set_controllerid($id);
+                $component->set_parent_view($this);
+                $this->components[$component_id] = $component;
+            }
+        }
+
+        $this->id = $id;
 		$this->controller = $controller;
 
         if(is_admin()) {
@@ -61,6 +72,8 @@ abstract class View extends Html_Base_Element {
         } else {
             $this->div_wrapper = array('class' => 'wpf-controller wpf-controller-style');
         }
+
+        parent::__construct( null, null );
 	}
 
 	public function add_div_wrapper( $attributes ) {
@@ -68,14 +81,14 @@ abstract class View extends Html_Base_Element {
 	}
 
 	public function remove_div_wrapper() {
-		$this->div_wrapper = null;
+		$this->div_wrapper = false;
 	}
 
 	/**
 	 * @param $id
 	 * @param $component Html_Base_Component
 	 */
-	protected function register_component( $id, $component ) {
+    public function register_component( $id, $component ) {
 		if ( isset( $id ) && is_object( $component ) ) {
 			$component->set_id( $id );
 			$component->set_controllerid( $this->id );
@@ -101,7 +114,7 @@ abstract class View extends Html_Base_Element {
 	}
 
 	public function create_content( $parameters = null ) {
-		if ( isset( $this->div_wrapper ) ) {
+		if ( $this->div_wrapper ) {
 			$attributes = $this->div_wrapper;
 
 			if ( isset( $this->id ) ) {
@@ -240,4 +253,24 @@ abstract class View extends Html_Base_Element {
 		}
 		return $values;
 	}
+
+	protected function get_html_components() {
+        $components = array();
+        $objects = get_object_vars($this);
+        foreach ($objects as $name => $object)
+        {
+            if (is_object($object))
+            {
+                if ($object instanceof Html_Base_Component)
+                {
+                    $real_name = $object->get_id();
+                    if( $real_name ) {
+                        $name = $real_name;
+                    }
+                    $components[$name] = $object;
+                }
+            }
+        }
+        return $components;
+    }
 }

@@ -27,7 +27,6 @@ namespace WP_PluginFramework\HtmlComponents;
 defined( 'ABSPATH' ) || exit;
 
 use WP_PluginFramework\HtmlElements\Input_Text;
-use WP_PluginFramework\HtmlElements\P;
 
 /**
  * Summary.
@@ -89,27 +88,20 @@ class Text_Line extends Input_Component {
 	}
 
 	public function create_content( $config = null ) {
-		$input_attr          = $this->input_attributes;
-		$input_attr['name']  = $this->name;
-		$input_attr['value'] = $this->value;
-		if ( isset( $this->type ) ) {
-			$input_attr['type'] = $this->type;
-		}
-		if ( $this->readonly ) {
-			$input_attr['readonly'] = 'readonly';
-		}
+        $input_attr = $this->input_attributes;
+        $input_attr['name'] = $this->name;
+        $input_attr['value'] = $this->value;
+        if (isset($this->type))
+        {
+            $input_attr['type'] = $this->type;
+        }
+        if ($this->readonly)
+        {
+            $input_attr['readonly'] = 'readonly';
+        }
 
-		$input = new Input_Text( $input_attr );
+        $input = new Input_Text($input_attr);
 
-		if($this->single){
-			$this->add_content( $input );
-		} else {
-			$wrapper = parent::create_content( $config );
-			$wrapper->add_content( $input );
-			if ( isset( $this->description ) ) {
-				$description = new P( $this->description, array( 'class' => 'description' ) );
-				$wrapper->add_content( $description );
-			}
-		}
-	}
+        $this->set_content($input);
+    }
 }

@@ -45,8 +45,6 @@ class Input_Component extends Html_Base_Component {
 	protected $touched;
 	/** @var string Value as sent from client side. */
 	protected $value;
-	/** @var string Header text to be displayed for input. */
-	protected $header;
 	/** @var boolean Client side can not change input. */
 	protected $readonly = false;
 	/** @var array string */
@@ -62,7 +60,7 @@ class Input_Component extends Html_Base_Component {
 	public function set_id( $id ) {
 		if( !isset( $this->name ) ) {
 			/* Every input must have a name in html attribute. */
-			$this->set_name( $id );
+			$this->name = $id;
 		}
 		parent::set_id( $id );
 	}

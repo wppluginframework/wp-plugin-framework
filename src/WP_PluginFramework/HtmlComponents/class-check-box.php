@@ -31,7 +31,6 @@ use WP_PluginFramework\HtmlElements\Label;
 use WP_PluginFramework\HtmlElements\Input_Checkbox;
 use WP_PluginFramework\HtmlElements\Legend;
 use WP_PluginFramework\HtmlElements\Span;
-use WP_PluginFramework\HtmlElements\P;
 
 /**
  * Summary.
@@ -118,8 +117,6 @@ class Check_Box extends Input_Component {
 	 * @param null $config
 	 */
 	public function create_content( $config = null ) {
-		$wrapper = parent::create_content( $config );
-
 		foreach ( $this->items as $value => $item ) {
 			$input_attr          = $this->input_attributes;
 			$input_attr['name']  = $value;
@@ -141,12 +138,7 @@ class Check_Box extends Input_Component {
 
 			$fieldset->add_content( $label );
 
-			$wrapper->add_content( $fieldset );
-		}
-
-		if ( isset( $this->description ) ) {
-			$description = new P( $this->description, array( 'class' => 'description' ) );
-			$wrapper->add_content( $description );
+			$this->add_content( $fieldset );
 		}
 	}
 }

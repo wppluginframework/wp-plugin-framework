@@ -26,17 +26,10 @@ namespace WP_PluginFramework\Views;
 
 defined( 'ABSPATH' ) || exit;
 
-use WP_PluginFramework\HtmlComponents\Html_Base_Component;
 use WP_PluginFramework\Plugin_Container;
 use WP_PluginFramework\HtmlElements\Form;
 use WP_PluginFramework\HtmlElements\Input_Hidden;
-use WP_PluginFramework\HtmlElements\Table;
-use WP_PluginFramework\HtmlElements\Tr;
-use WP_PluginFramework\HtmlElements\Td;
-use WP_PluginFramework\HtmlElements\P;
-use WP_PluginFramework\HtmlElements\H;
-use WP_PluginFramework\HtmlElements\Hr;
-use WP_PluginFramework\Utils\Debug_Logger;
+
 
 /**
  * Summary.
@@ -46,8 +39,7 @@ use WP_PluginFramework\Utils\Debug_Logger;
 class Form_View extends View {
 
 	protected $form_id = null;
-	/** @var array $form_inputs */
-	protected $show_form             = true;
+	protected $show_form = true;
 
 	const SEND_METHOD_AJAX = 'ajax';
 	const SEND_METHOD_POST = 'post';
@@ -56,18 +48,6 @@ class Form_View extends View {
 	private $method = 'ajax';
 
 	protected $hidden_fields         = array();
-
-	/**
-	 * Construction.
-	 *
-	 * @param $controller
-	 * @param array      $attributes
-	 */
-	public function __construct( $controller, $attributes = array() ) {
-		parent::__construct( $controller, null, $attributes );
-
-		$my_class = get_called_class();
-	}
 
 	public function set_method( $method ) {
 		$this->method = $method;
@@ -103,16 +83,28 @@ class Form_View extends View {
 
 			if ( isset( $this->form_id ) ) {
 				$attributes['id'] = $this->form_id;
-			}
+			} else {
+                $attributes['id'] = $this->id;
+            }
 
-			$form = new Form( $this->contents, $attributes );
+			$form = new Form( null, $attributes );
 
 			foreach ( $this->hidden_fields as $hidden_field_attributes ) {
 				$hidden_input = new Input_Hidden( $hidden_field_attributes );
 				$form->add_content( $hidden_input );
 			}
 
+            $form->add_content( $this->contents );
+
 			$this->set_content( $form );
+
+			if(!empty($this->pre_form_contents)) {
+                $this->prepend_content( $this->pre_form_contents );
+            }
+
+            if(!empty($this->post_form_contents)) {
+                $this->add_content( $this->post_form_contents );
+            }
 		}
 
 		parent::create_content( $parameters );

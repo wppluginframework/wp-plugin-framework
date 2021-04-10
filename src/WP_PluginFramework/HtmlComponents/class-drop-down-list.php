@@ -26,7 +26,7 @@ namespace WP_PluginFramework\HtmlComponents;
 
 use WP_PluginFramework\HtmlElements\Select;
 use WP_PluginFramework\HtmlElements\Option;
-use WP_PluginFramework\HtmlElements\P;
+use WP_PluginFramework\Utils\Debug_Logger;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -60,31 +60,63 @@ class Drop_Down_List extends Input_Component {
 		parent::__construct( $attributes, null );
 	}
 
-	public function create_content( $config = null ) {
-		$wrapper = parent::create_content( $config );
+	public function get_selected() {
+	    return $this->value;
+    }
 
+    public function set_items( $items = array(), $selected=null ) {
+        if (isset($this->id)) {
+            $form_selector = $this->get_form_selector();
+            $name          = $this->name;
+            $selector      = $form_selector . ' select[name=' . $name . ']';
+            $options = $this->create_options($items, $selected);
+            $html     = $this->draw_options($options);
+            $this->update_client_dom( $selector, 'html', array( $html ) );
+        } else {
+            Debug_Logger::write_debug_error( 'Component not registered.');
+        }
+    }
+
+    protected function draw_options( $options )
+    {
+        $html = '';
+        foreach ($options as $option) {
+            $html .= $option->draw_html();
+        }
+        return $html;
+    }
+
+    protected function create_options( $items, $selected=null ) {
+        $options = array();
+        if(isset($items))
+        {
+            foreach ($items as $value => $item)
+            {
+                $attributes = array();
+
+                $attributes['value'] = $value;
+
+                if ($value === $this->value)
+                {
+                    $attributes['selected'] = 'selected';
+                }
+
+                $option = new Option($item, $attributes);
+
+                array_push($options, $option);
+            }
+        }
+
+	    return $options;
+    }
+
+	public function create_content( $config = null ) {
 		$input_attr['name'] = $this->name;
 		$select             = new Select( null, $input_attr );
 
-		foreach ( $this->items as $value => $item ) {
-			$attributes = array();
+		$options = $this->create_options( $this->items, $this->value );
+        $select->set_content( $options );
 
-			$attributes['value'] = $value;
-
-			if ( $value === $this->value ) {
-				$attributes['selected'] = 'selected';
-			}
-
-			$option = new Option( $item, $attributes );
-
-			$select->add_content( $option );
-		}
-
-		$wrapper->add_content( $select );
-
-		if ( isset( $this->description ) ) {
-			$description = new P( $this->description, array( 'class' => 'description' ) );
-			$wrapper->add_content( $description );
-		}
+		$this->add_content( $select );
 	}
 }

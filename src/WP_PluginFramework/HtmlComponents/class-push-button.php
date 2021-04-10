@@ -49,6 +49,7 @@ class Push_Button extends Html_Base_Component {
 	protected $hidden_fields = array();
 
 	private $add_parents_hidden_field = true;
+	private $event_type = null;
 
 	/**
 	 * Construction.
@@ -70,16 +71,19 @@ class Push_Button extends Html_Base_Component {
 					$attributes['class'] = array( 'wp_plugin_framework_ajax_button' );
 				}
 				$attributes['type'] = 'button';
+                $this->event_type = 'click';
 				break;
 
 			case self::METHOD_POST:
 				$attributes['type']  = 'submit';
 				$attributes['class'] = array( 'wp_plugin_framework_post_button' );
+                $this->event_type = 'click';
 				break;
 
 			case self::METHOD_GET:
 				$attributes['type']  = 'get';
 				$attributes['class'] = array( 'wp_plugin_framework_get_button' );
+                $this->event_type = 'get';
 				break;
 		}
 
@@ -96,14 +100,14 @@ class Push_Button extends Html_Base_Component {
 	}
 
 	public function check_event_exist( $event, $event_type, $event_source ) {
-		if ( ( $event === $this->id ) && ( 'click' === $event_type ) ) {
+		if ( ( $event === $this->id ) && ( $this->event_type === $event_type ) ) {
 			return true;
 		}
 
 		return false;
 	}
 
-	public function set_primary( $primary ) {
+	public function set_primary( $primary=true ) {
 		$this->primary = $primary;
 	}
 
@@ -136,9 +140,19 @@ class Push_Button extends Html_Base_Component {
 	}
 
 	public function create_content( $config = null ) {
+        $this->attributes['name']  = '_event';
+        $this->attributes['value'] = $this->id;
+
 		if ( $this->primary ) {
 			$this->add_class( 'button-primary' );
-		}
+		} else {
+            $this->add_class( 'button' );
+        }
+
+        $button = new Button( $this->label, $this->attributes );
+        $this->add_content( $button );
+
+        return;
 
 		if ( ! isset( $config ) ) {
 			/* If no config, draw a stand-alone button with wrapped in a form */

@@ -27,7 +27,6 @@ namespace WP_PluginFramework\HtmlComponents;
 defined( 'ABSPATH' ) || exit;
 
 use WP_PluginFramework\HtmlElements\Textarea;
-use WP_PluginFramework\HtmlElements\P;
 
 /**
  * Summary.
@@ -73,8 +72,6 @@ class Text_Box extends Input_Component {
 	}
 
 	public function create_content( $config = null ) {
-		$wrapper = parent::create_content( $config );
-
 		$attributes['name']  = $this->name;
 		$attributes['class'] = 'large-text';
 		$attributes['type']  = 'text';
@@ -82,11 +79,6 @@ class Text_Box extends Input_Component {
 
 		$textarea = new Textarea( $this->value, $attributes );
 
-		$wrapper->add_content( $textarea );
-
-		if ( isset( $this->description ) ) {
-			$description = new P( $this->description, array( 'class' => 'description' ) );
-			$wrapper->add_content( $description );
-		}
+		$this->add_content( $textarea );
 	}
 }
