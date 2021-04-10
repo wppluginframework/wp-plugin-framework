@@ -27,6 +27,7 @@ namespace WP_PluginFramework\Models;
 defined( 'ABSPATH' ) || exit;
 
 use WP_PluginFramework\Database\Wp_Db_Interface;
+use WP_PluginFramework\DataTypes\Data_Type;
 use WP_PluginFramework\Utils\Debug_Logger;
 
 /**
@@ -220,17 +221,28 @@ abstract class Active_Record extends Model {
 								$old_data_str       = strval( $old_data[ $i ][ $meta_field_name ] );
 								$converted_data_str = strval( $converted_data[ $i ][ $temp_field_name ] );
 								if ( $old_data_str !== $converted_data_str ) {
-									Debug_Logger::write_debug_error( 'Error converting data index=' . strval( $i ) . ' Old value "' . $old_data_str . " new value '" . $converted_data_str . "'" );
-									$convert_error = true;
-								}
+								    if( $this->is_numeric_datatype($description_field_type)  or $this->is_numeric_datatype($meta_field_type))
+                                    {
+                                        $old_data_str       = doubleval( $old_data[ $i ][ $meta_field_name ] );
+                                        $converted_data_str = doubleval( $converted_data[ $i ][ $temp_field_name ] );
+                                        if ( $old_data_str !== $converted_data_str )
+                                        {
+                                            Debug_Logger::write_debug_error( 'Error converting data index=' . strval( $i ) . ' Old value "' . $old_data_str . " new value '" . $converted_data_str . "'" );
+                                            $convert_error = true;
+                                        }
+                                    }
+								} else {
+                                    Debug_Logger::write_debug_error( 'Error converting data index=' . strval( $i ) . ' Old value "' . $old_data_str . " new value '" . $converted_data_str . "'" );
+                                    $convert_error = true;
+                                }
 							}
 
 							if ( $convert_error ) {
 								$now                 = current_time( 'timestamp', true );
 								$now_str             = date( 'YmdHis', $now );
 								$old_data_field_name = $meta_field_name . '_old_' . $now_str;
-								$this->database->change_table_rename_field( $this->model_name, $meta_field_name, $old_data_field_name );
-								$this->database->change_table_rename_field( $this->model_name, $temp_field_name, $meta_field_name );
+								$this->database->change_table_rename_field( $this->model_name, $meta_field_name, $old_data_field_name, $description_field_type);
+								$this->database->change_table_rename_field( $this->model_name, $temp_field_name, $meta_field_name, $meta_field_type);
 
 								Debug_Logger::write_debug_error( 'Error converting data in table "' . $this->model_name . '"' );
 								Debug_Logger::write_debug_error( 'Old data stored in field "' . $old_data_field_name . '"' );
@@ -249,14 +261,14 @@ abstract class Active_Record extends Model {
 				if ( false === $field_found ) {
 					Debug_Logger::write_debug_note( 'Warning: Changing table "' . $this->model_name . '" add field "' . $meta_field_name . '" with type "' . strtoupper( $meta_field_type ) . '"' );
 					$default_value = $data_object->get_default_value();
-					$this->database->create_table_field( $this->model_name, $meta_field_name, $meta_field_type, $default_value, $previous_meta_field_name );
+					$result = $this->database->create_table_field( $this->model_name, $meta_field_name, $meta_field_type, $default_value, $previous_meta_field_name );
 				}
 
 				$previous_meta_field_name = $meta_field_name;
 
 			}
 		} else {
-			$data_type = $this->format_data_type_name( 'Id_Type' );
+			$data_type = Data_Type::format_data_type_name( 'Id_Type' );
 
 			$data_object = new $data_type();
 
@@ -281,6 +293,16 @@ abstract class Active_Record extends Model {
 			$this->database->create_table( $this->model_name, $db_metadata, self::PRIMARY_KEY );
 		}
 	}
+
+    public function is_numeric_datatype($db_type) {
+	    $numeric_list = array('integer', 'int', 'smallint', 'tinyint', 'mediumint', 'bitint', 'unsigned', 'float', 'double', 'decimal', 'numeric');
+	    foreach($numeric_list as $numeric_type) {
+            if ( strpos ( strtolower ( $db_type ), $numeric_type) !== false ) {
+                return true;
+            }
+        }
+        return  false;
+    }
 
 	public function remove() {
 		$this->database->remove_table( $this->model_name );
