@@ -547,8 +547,18 @@ abstract class Model extends Base_Object {
 	 *
 	 * @return mixed
 	 */
-	public function get_data_record() {
-		return $this->get_data_record_indexed( 0 );
+	public function get_data_record($columns=null) {
+        $record = $this->get_data_record_indexed( 0 );
+	    if(is_array($columns) and !empty($columns)){
+            foreach($columns as $key) {
+                if(array_key_exists($key, $record)) {
+                    $result_record[$key] = $record[$key];
+                }
+            }
+        } else {
+            $result_record = $record;
+        }
+		return $result_record;
 	}
 
 	/**
@@ -561,6 +571,22 @@ abstract class Model extends Base_Object {
 	protected function get_data_record_indexed( $index ) {
 		return $this->data_objects[ $index ];
 	}
+
+    public function get_data_record_search( $key, $value ) {
+        if ( $this->field_name_exist( $key ) ) {
+            if ( count( $this->data_objects ) ) {
+                foreach ( $this->data_objects as $data_objects ) {
+                    if( $data_objects[$key] === $value ) {
+                        return $data_objects;
+                    }
+                }
+            }
+        } else {
+            Debug_Logger::write_debug_error( 'Invalid key ' . $key );
+        }
+
+        return false;
+    }
 
 	/**
 	 * Summary.
@@ -644,10 +670,78 @@ abstract class Model extends Base_Object {
 		}
 	}
 
-	public function get_copy_all_data() {
-		// TODO May have to clone this
-		return $this->data_objects;
+	public function get_copy_all_data( $columns = array(), $id_as_index=false ) {
+        $copied_data = array();
+
+        if(empty($columns))
+        {
+            // TODO May have to clone this
+            $copied_data = $this->data_objects;
+        }
+        else
+        {
+            foreach ( $this->data_objects as $i => $row ) {
+                $copied_row = array();
+                foreach($columns as $column) {
+                    if(array_key_exists($column, $row)) {
+                        $copied_row[$column] = $row[$column];
+                    }
+                }
+                if($id_as_index) {
+                    $copied_data [$row[self::PRIMARY_KEY]] = $row;
+                } else {
+                    array_push ( $copied_data, $copied_row);
+                }
+            };
+        }
+
+		return $copied_data;
 	}
+
+    public function get_all_data_objects( $columns = array(), $id_as_index=false ) {
+        $data_objects_list = array();
+
+        $metadata_list = $this->get_meta_data_list();
+        foreach ( $this->data_objects as $idx => $record )
+        {
+            $record_objects = array();
+            if(empty($columns))
+            {
+                foreach ( $record as $key => $value )
+                {
+                    $metadata = $metadata_list[$key];
+                    $data_object = $this->create_data_object($metadata, $key, $value, $record);
+                    $record_objects[$key] = $data_object;
+                }
+                if($id_as_index) {
+                    $data_objects_list [$record[self::PRIMARY_KEY]] = $record_objects;
+                } else {
+                    array_push($data_objects_list, $record_objects);
+                }
+            }
+            else
+            {
+                foreach ( $columns as $key )
+                {
+                    if(array_key_exists( $key, $metadata_list ))
+                    {
+                        $metadata = $metadata_list[$key];
+                        $value = $record[$key];
+                        $data_object = $this->create_data_object($metadata, $key, $value, $record);
+                        $record_objects[$key] = $data_object;
+                    }
+                }
+                if($id_as_index) {
+                    $data_objects_list [$record[self::PRIMARY_KEY]] = $record_objects;
+                } else {
+                    array_push($data_objects_list, $record_objects);
+                }
+            }
+        }
+
+        return $data_objects_list;
+    }
+
 
 	public function get_data_count() {
 		return count( $this->data_objects );
@@ -659,6 +753,17 @@ abstract class Model extends Base_Object {
 			array_shift( $this->touched_data );
 		}
 	}
+
+    public function load_data_id( $id ) {
+        $conditions   = array();
+        $conditions[] = array(
+            'field' => self::PRIMARY_KEY,
+            'value' => $id,
+        );
+
+        $this->clear_all_data();
+        return $this->load_more_data( $conditions );
+    }
 
 	public function load_data( $conditions = null, $value = null ) {
 		if ( gettype( $conditions ) === 'string' ) {

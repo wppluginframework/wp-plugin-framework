@@ -100,4 +100,13 @@ class Option_Model extends Model {
 		update_option( $this->model_name, $data_record );
 		return true;
 	}
+
+	static public function get_options($key) {
+        $options = get_option(static::OPTION_NAME);
+	    if($key) {
+            return $options[$key];
+        } else {
+            return $options;
+        }
+    }
 }
