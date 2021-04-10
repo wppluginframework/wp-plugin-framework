@@ -98,10 +98,15 @@ abstract class Model extends Base_Object {
 	 *
 	 * @return |null
 	 */
-	protected function get_meta_data( $key ) {
-		if ( array_key_exists( $key, static::$meta_data ) ) {
-			return static::$meta_data[ $key ];
-		} else {
+    public function get_meta_data( $key ) {
+        if ( array_key_exists( $key, static::$meta_data )) {
+            return static::$meta_data[$key];
+        } elseif ( $key === self::PRIMARY_KEY ) {
+            $meta_data['data_type'] = 'Id_Type';
+            $meta_data['default_value'] = 0;
+            $meta_data['label'] = 'ID';
+            return $meta_data;
+        } else {
 			Debug_Logger::write_debug_error( 'Unknown model key ' . $key );
 			return null;
 		}
@@ -112,8 +117,29 @@ abstract class Model extends Base_Object {
 	 *
 	 * @return
 	 */
-	public function get_meta_data_list() {
-		return static::$meta_data;
+	public function get_meta_data_list( $columns = array() ) {
+        if( empty( $columns ))
+        {
+            $id_meta = array(
+                self::PRIMARY_KEY => $this->get_meta_data(self::PRIMARY_KEY)
+            );
+            $meta_data = array_merge($id_meta, static::$meta_data);
+            return $meta_data;
+        }
+        else
+        {
+            $selected_meta_data = array();
+            foreach ($columns as $key)
+            {
+                if (array_key_exists($key, static::$meta_data)) {
+                    $selected_meta_data[$key] = $this->get_meta_data($key);
+                }
+                elseif ( $key === self::PRIMARY_KEY ) {
+                    $selected_meta_data[$key] = $this->get_meta_data($key);
+                }
+            };
+            return $selected_meta_data;
+        }
 	}
 
 	/**
@@ -178,7 +204,8 @@ abstract class Model extends Base_Object {
 				}
 				$record[ $meta_name ] = $default_value;
 			} else {
-				Debug_Logger::write_debug_note( 'Field name ' . self::PRIMARY_KEY . ' is reserved.' );
+			    // TODO: Fix this.
+				// Debug_Logger::write_debug_note( 'Field name ' . self::PRIMARY_KEY . ' is reserved.' );
 			}
 		}
 		return $record;
