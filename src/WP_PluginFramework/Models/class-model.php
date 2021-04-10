@@ -158,27 +158,14 @@ abstract class Model extends Base_Object {
 	}
 
 	/**
-	 * @param  $name string
-	 *
-	 * @return string
-	 */
-	protected function format_data_type_name( $name ) {
-		$namespace_root = str_replace( '\\Models', '', __NAMESPACE__ );
-		$data_type      = $namespace_root . '\\DataTypes\\' . $name;
-		return $data_type;
-	}
-
-	/**
 	 * @param $metadata array
 	 * @param $key string
 	 * @param $value
 	 *
 	 * @return Data_Type
 	 */
-	protected function create_data_object( $metadata, $key, $value = null ) {
-		$data_type   = $this->format_data_type_name( $metadata['data_type'] );
-		$data_object = new $data_type( $metadata, $key, $value );
-		return $data_object;
+	protected function create_data_object( $metadata, $key, $value = null, $record = null ) {
+        return Data_Type::create_data_object( $metadata, $key, $value);
 	}
 
 	/**
@@ -256,7 +243,7 @@ abstract class Model extends Base_Object {
 	public function get_data_type_class( $key ) {
 		$metadata = $this->get_meta_data( $key );
 		if ( isset( $metadata ) ) {
-			$data_type_class = $this->format_data_type_name( $metadata['data_type'] );
+			$data_type_class = Data_Type::format_data_type_name( $metadata['data_type'] );
 		} else {
 			Debug_Logger::write_debug_error( 'No metadata for key ' . $key );
 			$data_type_class = null;
@@ -635,7 +622,8 @@ abstract class Model extends Base_Object {
 		if ( $this->field_name_exist( $key ) ) {
 			$value       = $this->data_objects[ $index ][ $key ];
 			$metadata    = $this->get_meta_data( $key );
-			$data_object = $this->create_data_object( $metadata, $key, $value );
+			$record = $this->data_objects[$index];
+			$data_object = $this->create_data_object( $metadata, $key, $value, $record );
 			return $data_object;
 		} else {
 			Debug_Logger::write_debug_error( 'Invalid key ' . $key );

@@ -24,6 +24,8 @@
 
 namespace WP_PluginFramework\DataTypes;
 
+use WP_PluginFramework\Utils\Debug_Logger;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -43,4 +45,20 @@ class Id_Type extends Data_Type {
 
 		parent::__construct( $metadata, $key, $value );
 	}
+
+    public function set_value( $value ) {
+        switch ( gettype( $value ) ) {
+            case 'string':
+                $this->value = intval( $value );
+                break;
+
+            case 'integer':
+                $this->value = $value;
+                break;
+
+            default:
+                Debug_Logger::write_debug_error( 'Unsupported data type ' . gettype( $value ) );
+                break;
+        }
+    }
 }
