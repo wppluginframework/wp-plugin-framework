@@ -26,7 +26,7 @@ namespace WP_PluginFramework\DataTypes;
 
 defined( 'ABSPATH' ) || exit;
 
-use WP_PluginFramework\Base\Base_Object;
+use WP_PluginFramework\Base\Content_Object;
 use WP_PluginFramework\Utils\Debug_Logger;
 
 /**
@@ -34,7 +34,7 @@ use WP_PluginFramework\Utils\Debug_Logger;
  *
  * Description.
  */
-class Data_Type extends Base_Object {
+class Data_Type extends Content_Object {
 
 	protected static $default_data_type         = null;
 	protected static $default_string_validation = null;
@@ -46,6 +46,7 @@ class Data_Type extends Base_Object {
 	protected $value             = null;
 	protected $validate_errors   = array();
 	protected $html_widget_class = null;
+    protected $label             = null;
 
 	const DATA_SIZE         = 'data_size';
 	const DEFAULT_VALUE     = 'default_value';
@@ -103,7 +104,7 @@ class Data_Type extends Base_Object {
 			$this->value = $this->default_value;
 		}
 
-		parent::__construct( $properties );
+		parent::__construct( null, $properties );
 	}
 
 	public static function get_type() {
@@ -182,6 +183,10 @@ class Data_Type extends Base_Object {
 		return $this->value;
 	}
 
+    public function get_label() {
+        return $this->label;
+    }
+
 	/**
 	 * Summary.
 	 *
@@ -195,19 +200,62 @@ class Data_Type extends Base_Object {
 		return $this->get_string();
 	}
 
-	public function get_html_component( $attributes = null ) {
-		$html_component       = null;
-		$html_component_class = $this->html_widget_class;
+	public function get_html_component_class_name() {
+        $html_component_class_name = $this->html_widget_class;
+        if(!isset($html_component_class_name))
+        {
+            switch ( static::$default_data_type ) {
+                case 'integer':
+                case 'string':
+                case 'double':
+                    $html_component_class_name = 'Text_Line';
+                    break;
 
-		if ( ! strpos( $html_component_class, '\\' ) ) {
-			/* If only class name set, use vendor's default HtmlComponents */
-			$namespace            = explode( '\\', __NAMESPACE__ );
-			$html_component_class = $namespace[0] . '\\HtmlComponents\\' . $html_component_class;
-		}
+                default:
+                    Debug_Logger::write_debug_error( 'Missing property \'db_field_type\' data type"' );
+                    break;
+            }
+        }
+
+        if ( ! strpos( $html_component_class_name, '\\' ) ) {
+            /* If only class name set, use vendor's default HtmlComponents */
+            $namespace            = explode( '\\', __NAMESPACE__ );
+            $html_component_class_name = $namespace[0] . '\\HtmlComponents\\' . $html_component_class_name;
+        }
+
+	    return $html_component_class_name;
+    }
+
+	public function get_html_component( $attributes = null ) {
+        $html_component       = null;
+
+		$html_component_class = $this->get_html_component_class_name();
 
 		if ( isset( $html_component_class ) ) {
-			$html_component = new $html_component_class( $attributes, $this->get_properties() );
+			$html_component = new $html_component_class();
+            $html_component->set_attributes($attributes);
+            $html_component->set_properties($this->get_properties());
 		}
 		return $html_component;
 	}
+
+    public function create_content() {
+	    $content = $this->get_formatted_text();
+        $this->set_content( $content );
+    }
+
+    static public function create_data_object( $metadata, $key, $value = null ) {
+        $data_type   = self::format_data_type_name( $metadata['data_type'] );
+        $data_object = new $data_type( $metadata, $key, $value );
+        return $data_object;
+    }
+
+    static public function format_data_type_name( $name ) {
+        if ( strstr ( $name, '\\' )) {
+            $data_type = $name;
+        } else {
+            $data_type = __NAMESPACE__ . '\\' . $name;
+        }
+        return $data_type;
+    }
 }

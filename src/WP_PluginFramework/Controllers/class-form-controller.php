@@ -43,4 +43,6 @@ class Form_Controller extends Controller {
 
 		$this->view->set_values( $values );
 	}
+
+    public function create_content() {}
 }

@@ -34,10 +34,6 @@ defined( 'ABSPATH' ) || exit;
  * Description.
  */
 class Base_Object {
-
-	/** @var array $contents BaseObject Holds content for this object. */
-	protected $contents = array();
-
 	/**
 	 * Construction.
 	 *
@@ -61,9 +57,11 @@ class Base_Object {
 		foreach ( $properties as $key => $value ) {
 			$this->$key = $value;
 		}
+
+		return;
 	}
 
-	/**
+    /**
 	 * Summary.
 	 *
 	 * @return array All properties returned.
@@ -81,6 +79,7 @@ class Base_Object {
 	 */
 	public function set_property( $property, $value ) {
 		$this->$property = $value;
+		return true;
 	}
 
 	/**
@@ -130,6 +129,14 @@ class Base_Object {
 			return null;
 		}
 	}
+
+    public function set_property_key_value( $property, $key, $value) {
+        if ( isset( $this->$property ) ) {
+            if ( is_array( $this->$property ) ) {
+                $this->$property[ $key ] = $value;
+            }
+        }
+    }
 
 	/**
 	 * Add values to an property array given with key.
@@ -232,66 +239,5 @@ class Base_Object {
 			}
 		}
 		return null;
-	}
-
-	/**
-	 * Summary.
-	 *
-	 * @param $content
-	 */
-	public function set_content( $content ) {
-		$this->contents = array();
-
-		if ( isset( $content ) ) {
-			switch ( gettype( $content ) ) {
-				case 'array':
-					$this->contents = $content;
-					break;
-
-				default:
-					$this->contents = array( $content );
-			}
-		}
-	}
-
-	/**
-	 * Summary.
-	 *
-	 * @param $content
-	 */
-	public function add_content( $content ) {
-		switch ( gettype( $content ) ) {
-			case 'array':
-				$this->contents = array_merge( $this->contents, $content );
-				break;
-
-			default:
-				array_push( $this->contents, $content );
-		}
-	}
-
-	/**
-	 * Summary.
-	 *
-	 * @param $content
-	 */
-	public function prepend_content( $content ) {
-		switch ( gettype( $content ) ) {
-			case 'array':
-				$this->contents = array_unshift( $this->contents, $content );
-				break;
-
-			default:
-				array_unshift( $this->contents, $content );
-		}
-	}
-
-	/**
-	 * Summary.
-	 *
-	 * @return array
-	 */
-	public function get_content() {
-		return $this->contents;
 	}
 }

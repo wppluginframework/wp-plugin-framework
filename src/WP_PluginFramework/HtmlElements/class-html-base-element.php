@@ -26,7 +26,8 @@ namespace WP_PluginFramework\HtmlElements;
 
 defined( 'ABSPATH' ) || exit;
 
-use WP_PluginFramework\Base\Base_Object;
+use WP_PluginFramework\Base\Content_Object;
+use WP_PluginFramework\Controllers\Controller;
 use WP_PluginFramework\HtmlComponents\Html_Text;
 use WP_PluginFramework\Utils\Debug_Logger;
 use WP_PluginFramework\Utils\Security_Filter;
@@ -36,7 +37,7 @@ use WP_PluginFramework\Utils\Security_Filter;
  *
  * Description.
  */
-abstract class Html_Base_Element extends Base_Object {
+abstract class Html_Base_Element extends Content_Object {
 
 	/** @var array HtmlBaseElement */
 	protected $contents = array();
@@ -58,14 +59,31 @@ abstract class Html_Base_Element extends Base_Object {
 	 * @param $attributes
 	 * @param null       $properties
 	 */
-	public function __construct( $tag, $end_tag, $content, $attributes, $properties = null ) {
+	public function __construct( $tag, $end_tag, $content = null, $attributes = array(), $properties = array() ) {
 		$this->tag     = $tag;
 		$this->end_tag = $end_tag;
-		$this->set_content( $content );
-		$this->attributes = $attributes;
-
-		parent::__construct( $properties );
+		$this->set_attributes($attributes);
+		parent::__construct( $content, $properties );
 	}
+
+	public function set_attributes($attributes) {
+	    if( ! is_null( $attributes )) {
+	       switch( gettype( $attributes ))
+           {
+               case 'array':
+                   if( ! empty( $attributes )) {
+                       $this->attributes = $attributes;
+                   }
+                   break;
+               default:
+                   $this->attributes = array($attributes);
+                   break;
+           }
+	       return true;
+        } else {
+	       return false;
+        }
+    }
 
 	/**
 	 * Summary.
@@ -74,8 +92,12 @@ abstract class Html_Base_Element extends Base_Object {
 	 * @param $value
 	 */
 	public function set_attribute( $key, $value ) {
-		$this->set_property_key_values( 'attributes', $key, $value );
+		$this->set_property_key_value( 'attributes', $key, $value );
 	}
+
+    public function add_attribute( $key, $value ) {
+        $this->set_property_key_values( 'attributes', $key, $value );
+    }
 
 	/**
 	 * Summary.
@@ -186,27 +208,42 @@ abstract class Html_Base_Element extends Base_Object {
 	/**
 	 * Summary.
 	 *
-	 * @param $name
-	 */
-	public function set_name( $name ) {
-		$this->set_property( 'name', $name );
-	}
-
-	/**
-	 * Summary.
-	 *
-	 * @return |null
-	 */
-	public function get_name() {
-		return $this->get_property( 'name' );
-	}
-
-	/**
-	 * Summary.
-	 *
 	 * @param null $config
 	 */
 	public function create_content( $config = null ) {   }
+
+	protected function prepare_create_content( $content, $config){
+        $content_type = gettype($content);
+        switch ($content_type)
+        {
+            case 'object':
+                if (empty($content->contents))
+                {
+                    $content->create_content($config);
+                }
+                break;
+
+            case 'array':
+                foreach ( $content as $array_content ) {
+                    if ( is_object( $array_content ) ) {
+                        if ( $array_content instanceof Content_Object)
+                        {
+                            if (empty ($array_content->contents))
+                            {
+                                $array_content->create_content($config);
+                            }
+                        } elseif ( ! ($array_content instanceof Controller )) {
+                            Debug_Logger::write_debug_error( 'Missing create_content function in object.', get_class($array_content) );
+                        }
+                    }
+                }
+                break;
+
+            default;
+                break;
+        }
+        return $content;
+    }
 
 	/**
 	 * Summary.
@@ -215,12 +252,7 @@ abstract class Html_Base_Element extends Base_Object {
 	 * @param null    $config
 	 */
 	public function set_content( $content, $config = null ) {
-		if ( is_object( $content ) ) {
-			if ( empty( $content->contents ) ) {
-				$content->create_content( $config );
-			}
-		}
-
+        $content = $this->prepare_create_content($content, $config);
 		parent::set_content( $content );
 	}
 
@@ -231,12 +263,7 @@ abstract class Html_Base_Element extends Base_Object {
 	 * @param null    $config
 	 */
 	public function add_content( $content, $config = null ) {
-		if ( is_object( $content ) ) {
-			if ( empty( $content->contents ) ) {
-				$content->create_content( $config );
-			}
-		}
-
+        $content = $this->prepare_create_content($content, $config);
 		parent::add_content( $content );
 	}
 
@@ -247,12 +274,7 @@ abstract class Html_Base_Element extends Base_Object {
 	 * @param null    $config
 	 */
 	public function prepend_content( $content, $config = null ) {
-		if ( is_object( $content ) ) {
-			if ( ! isset( $content->tag ) || empty( $content->contents ) ) {
-				$content->create_content( $config );
-			}
-		}
-
+        $content = $this->prepare_create_content($content, $config);
 		parent::prepend_content( $content );
 	}
 
@@ -285,75 +307,53 @@ abstract class Html_Base_Element extends Base_Object {
 		$this->set_content( $text );
 	}
 
-	/**
-	 * Summary.
-	 *
-	 * @return string
-	 */
-	public function draw_html() {
-		$html = '';
+    /**
+     * Summary.
+     *
+     * @return string
+     */
+    public function draw_html() {
+        $html = parent::draw_html();
 
-		foreach ( $this->contents as $content ) {
-			$content_type = gettype( $content );
-			switch ( $content_type ) {
-				case 'object':
-					$html .= $content->draw_html();
-					break;
+        if ( isset( $this->tag ) ) {
+            $start_html = '<' . $this->tag;
+            if ( isset( $this->attributes ) ) {
+                foreach ( $this->attributes as $attribute => $value ) {
+                    if ( is_array( $value ) ) {
+                        switch ( $attribute ) {
+                            case 'class':
+                                $value = implode( ' ', $value );
+                                break;
 
-				case 'string':
-					$html .= esc_html( $content );
-					break;
+                            case 'style':
+                                $value = implode( ';', $value );
+                                break;
 
-				case 'integer':
-				case 'double':
-					$html .= strval( $content );
-					break;
+                            default:
+                                $value = '';
+                                Debug_Logger::write_debug_error( 'Missing array handler.', get_class($this), $attribute );
+                                break;
+                        }
+                    }
 
-				default:
-					$html .= 'Error: Undefined html content type';
-					break;
-			}
-		}
+                    $start_html .= ' ' . $attribute . '="' . esc_attr( $value ) . '"';
+                }
+            }
 
-		if ( isset( $this->tag ) ) {
-			$start_html = '<' . $this->tag;
-			if ( isset( $this->attributes ) ) {
-				foreach ( $this->attributes as $attribute => $value ) {
-					if ( is_array( $value ) ) {
-						switch ( $attribute ) {
-							case 'class':
-								$value = implode( ' ', $value );
-								break;
+            if ( $this->end_tag ) {
+                $html = $start_html . '>' . $html . '</' . $this->tag . '>';
+            } else {
+                if ( '' !== $html ) {
+                    /* We can not have inner html when closing tag don't exist. */
+                    die();
+                }
 
-							case 'style':
-								$value = implode( ';', $value );
-								break;
+                $html .= $start_html . '/>';
+            }
+        }
 
-							default:
-								$value = '';
-								Debug_Logger::write_debug_error( 'Missing array handler for ' . $attribute );
-								break;
-						}
-					}
-
-					$start_html .= ' ' . $attribute . '="' . esc_attr( $value ) . '"';
-				}
-			}
-
-			if ( $this->end_tag ) {
-				$html = $start_html . '>' . $html . '</' . $this->tag . '>';
-			} else {
-				if ( '' !== $html ) {
-					/* We can not have inner html when closing tag don't exist. */
-					die();
-				}
-
-				$html .= $start_html . '/>';
-			}
-		}
-
-		return $html;
-	}
+        return $html;
+    }
 
 	/**
 	 * Summary.
