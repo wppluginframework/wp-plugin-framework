@@ -180,7 +180,7 @@ abstract class Controller {
 	 * @param null $view_class
 	 * @param bool $clear_client_context_data
 	 */
-	public function reload_view( $view_class = null, $clear_client_context_data = false ) {
+	public function reload_view( $view_class = null, $clear_client_context_data = false, $values = array(), $parameters = null ) {
 		if ( ! isset( $view_class ) ) {
 			$view_class = $this->nonce_protected_data[ self::PROTECTED_DATA_VIEW ];
 		}
@@ -195,11 +195,10 @@ abstract class Controller {
 			switch ( $this->event_source ) {
 				case self::EVENT_METHOD_AJAX:
 					$this->view = $this->instantiate_view( $view_class );
-					$values     = array();
 					$values     = $this->load_model_values( $values );
 					$this->init_view( $values );
 					$this->view->remove_div_wrapper();
-					$html = $this->draw_view();
+					$html = $this->draw_view( $parameters );
 
 					if ( ! isset( $html ) ) {
 						Debug_Logger::write_debug_error( 'DrawView returned nothing.' );
@@ -212,7 +211,6 @@ abstract class Controller {
 				case self::EVENT_METHOD_GET:
 				case self::EVENT_METHOD_POST:
 					$this->view = $this->instantiate_view( $view_class );
-					$values     = array();
 					$values     = $this->load_model_values( $values );
 					$this->init_view( $values );
 					break;
@@ -230,14 +228,14 @@ abstract class Controller {
 	 * @param $controller Controller
 	 * @return null
 	 */
-	public function reload_controller( $controller ) {
+	public function reload_controller( $controller, $args = array(), $values = array(), $parameters = null ) {
 		$this->ajax_response               = array();
-		$this->client_context_data         = array();
-		$this->client_context_data_touched = false;
+        $this->client_context_data = array();
+        $this->client_context_data_touched = false;
 
 		if ( isset( $controller ) ) {
 			if ( is_string( $controller ) ) {
-				$controller = new $controller();
+                $controller = new $controller( ... $args );
 			}
 		}
 
@@ -248,10 +246,9 @@ abstract class Controller {
 			case self::EVENT_METHOD_AJAX:
 				$controller->load_context_data();
 				$this->view = $controller->instantiate_view();
-				$values     = array();
 				$values     = $controller->load_model_values( $values );
 				$controller->init_view( $values );
-				$html = $controller->draw_view();
+				$html = $controller->draw_view( $parameters );
 
 				if ( ! isset( $html ) ) {
 					Debug_Logger::write_debug_error( 'DrawView returned nothing.' );
@@ -607,7 +604,7 @@ abstract class Controller {
 		if ( $this->nonce_protected_data[ self::PROTECTED_DATA_VIEW ] ) {
 			$my_controller_name = get_called_class();
 
-			$this->view = new $this->nonce_protected_data[ self::PROTECTED_DATA_VIEW ]($this->id, $my_controller_name);
+			$this->view = new $this->nonce_protected_data[ self::PROTECTED_DATA_VIEW ]($this->id, $my_controller_name, $this->model);
 
 			$view = $this->view;
 		}
