@@ -43,7 +43,7 @@ class Boolean_Type extends Data_Type {
 		}
 
 		if ( ! isset( $metadata[ self::HTML_WIDGET_CLASS ] ) ) {
-			$metadata[ self::HTML_WIDGET_CLASS ] = 'CheckBox';
+			$metadata[ self::HTML_WIDGET_CLASS ] = 'Check_Box';
 		}
 
 		parent::__construct( $metadata, $key, $value );

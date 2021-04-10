@@ -53,7 +53,7 @@ class String_Type extends Data_Type {
 		}
 
 		if ( ! isset( $properties[ self::HTML_WIDGET_CLASS ] ) ) {
-			$properties[ self::HTML_WIDGET_CLASS ] = 'TextLine';
+			$properties[ self::HTML_WIDGET_CLASS ] = 'Text_Line';
 		}
 
 		parent::__construct( $properties, $key, $value );
