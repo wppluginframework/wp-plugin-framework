@@ -39,7 +39,11 @@ class A extends Html_Base_Element {
 	 * @param null $content
 	 * @param null $attributes
 	 */
-	public function __construct( $content = null, $attributes = null ) {
+	public function __construct( $content = null, $href = null, $attributes = array() ) {
 		parent::__construct( 'a', true, $content, $attributes );
+
+        if( isset($href)) {
+            $this->set_attribute('href', $href);
+        }
 	}
 }

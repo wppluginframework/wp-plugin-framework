@@ -61,8 +61,7 @@ class Link extends Html_Base_Component {
 	 * @param null $config
 	 */
 	public function create_content( $config = null ) {
-		$attributes['href'] = $this->href;
-		$a                  = new A( $this->text, $attributes );
+		$a                  = new A( $this->text, $this->href );
 		$this->add_content( $a );
 	}
 }
