@@ -42,4 +42,67 @@ class Td extends Html_Base_Element {
 	public function __construct( $content = null, $attributes = null ) {
 		parent::__construct( 'td', true, $content, $attributes );
 	}
+
+    public function create_array_content( $contents ) {
+        $contents_created = array();
+
+        foreach ( $contents as $content )
+        {
+            $content_type = gettype($content);
+            switch ($content_type)
+            {
+                case 'object':
+                    $content->create_content();
+                    $content_created = $content->get_content();
+                    break;
+
+                case 'string':
+                    $content_created = esc_html( $content );
+                    break;
+
+                case 'integer':
+                case 'double':
+                    $content_created = strval( $content );
+                    break;
+
+                default:
+                    $content_created = 'Error: Undefined content type in td array.';
+                    break;
+            }
+            $contents_created = array_merge($contents_created, $content_created );
+        }
+
+        return $contents_created;
+    }
+
+	public function create_content($config = null)
+    {
+        $content = null;
+
+        $content_type = gettype( $this->contents );
+        switch ( $content_type ) {
+            case 'object':
+                $content = $this->contents->create_content();
+                break;
+
+            case 'string':
+                $content = esc_html( strval($this->contents) );
+                break;
+
+            case 'integer':
+            case 'double':
+                $content = strval( $this->contents );
+                break;
+
+            case 'array':
+                $content = $this->create_array_content( $this->contents );
+                break;
+
+            default:
+                $content = 'Error: Undefined content type in td.';
+                break;
+        }
+
+        $this->set_content($content);
+    }
 }

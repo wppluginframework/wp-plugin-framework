@@ -52,7 +52,7 @@ class Table extends Html_Base_Element {
 	 * @param $tr_attributes
 	 * @param $td_attributes
 	 */
-	public function add_row( $content, $tr_attributes, $td_attributes ) {
+	public function add_row_OBSOLETE( $content, $tr_attributes, $td_attributes ) {
 		$tr = null;
 
 		$object_type = gettype( $content );
