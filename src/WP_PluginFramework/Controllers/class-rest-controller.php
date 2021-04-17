@@ -37,7 +37,8 @@ class Rest_Controller
 
     CONST ENDPOINT_ID_KEY = 'id';
 
-    CONST METHOD_GET = 'METHOD_GET';
+    CONST METHOD_GET_ONE = 'METHOD_GET_ONE';
+    CONST METHOD_GET_MANY = 'METHOD_GET_MANY';
     CONST METHOD_GET_ID = 'METHOD_GET_ID';
     CONST METHOD_POST = 'METHOD_POST';
 
@@ -70,11 +71,22 @@ class Rest_Controller
     {
         foreach($methods as $method => $args) {
             switch ($method) {
-                case self::METHOD_GET:
+                case self::METHOD_GET_ONE:
                     register_rest_route( $this->name_space, $route, array(
                         array(
                             'methods'  => \WP_REST_Server::READABLE,
-                            'callback' => array($this, 'endpoint_get'),
+                            'callback' => array($this, 'endpoint_get_one'),
+                            'permission_callback' => array($this, 'endpoint_get_has_permission')
+                        ),
+                        'schema' => array($this, 'get_schema')
+                    ));
+                    break;
+
+                case self::METHOD_GET_MANY:
+                    register_rest_route( $this->name_space, $route, array(
+                        array(
+                            'methods'  => \WP_REST_Server::READABLE,
+                            'callback' => array($this, 'endpoint_get_many'),
                             'permission_callback' => array($this, 'endpoint_get_has_permission')
                         ),
                         'schema' => array($this, 'get_schema')
@@ -342,7 +354,41 @@ class Rest_Controller
         return $query_db_parameters;
     }
 
-    public function endpoint_get_read_database ($request, $query_parameters) {
+    public function endpoint_get_one_read_data ($request, $query_parameters) {
+        $model = $this->get_model();
+        $model->load_data_query_parameters($query_parameters);
+        $fields = $query_parameters->get_fields();
+        $record = $model->get_record($fields);
+        return $record;
+    }
+
+    public function endpoint_get_one ($request) {
+        $query_parameters = $this->get_request_parameters($request);
+        $model = $this->get_model();
+        if($model) {
+            $query_db_parameters = $this->convert_rest_to_db_request_parameters($query_parameters);
+        } else {
+            $query_db_parameters = $query_parameters;
+        }
+
+        $data_record = $this->endpoint_get_one_read_data ($request, $query_db_parameters);
+
+        if ( empty( $data_record ) ) {
+            return $this->send_success_response( null, $query_db_parameters  );
+        }
+
+        if($model) {
+            $data_record = $this->convert_db_to_rest_record($data_record);
+        }
+        $schema = $this->get_schema();
+        $schema = $this->get_schema_filter_fields($schema, $query_parameters->get_fields());
+        $response = $this->filter_schema_data($data_record, $schema);
+        $data = $this->prepare_for_collection( $response );
+
+        return $this->send_success_response($data, $query_db_parameters);
+    }
+
+    public function endpoint_get_many_read_data ($request, $query_parameters) {
         $model = $this->get_model();
         $model->load_data_query_parameters($query_parameters);
         $fields = $query_parameters->get_fields();
@@ -350,24 +396,30 @@ class Rest_Controller
         return $records;
     }
 
-    public function endpoint_get ($request) {
+    public function endpoint_get_many ($request) {
         $query_parameters = $this->get_request_parameters($request);
+        $model = $this->get_model();
+        if($model) {
+            $query_db_parameters = $this->convert_rest_to_db_request_parameters($query_parameters);
+        } else {
+            $query_db_parameters = $query_parameters;
+        }
 
-        $query_db_parameters = $this->convert_rest_to_db_request_parameters($query_parameters);
-
-        $db_records = $this->endpoint_get_read_database ($request, $query_db_parameters);
+        $data_records = $this->endpoint_get_many_read_data ($request, $query_db_parameters);
 
         $data = array();
 
-        if ( empty( $db_records ) ) {
+        if ( empty( $data_records ) ) {
             return $this->send_success_response( $data, $query_db_parameters  );
         }
 
-        foreach ( $db_records as $db_record ) {
-            $rest_record = $this->convert_db_to_rest_record($db_record);
+        foreach ( $data_records as $data_record ) {
+            if($model) {
+                $data_record = $this->convert_db_to_rest_record($data_record);
+            }
             $schema = $this->get_schema();
             $schema = $this->get_schema_filter_fields($schema, $query_parameters->get_fields());
-            $response = $this->filter_schema_data($rest_record, $schema);
+            $response = $this->filter_schema_data($data_record, $schema);
             $data[] = $this->prepare_for_collection( $response );
         }
 
