@@ -46,18 +46,19 @@ class Check_Box extends Input_Component {
 	/** @var string Label for checkbox, showed behind input. */
 	protected $label;
 
+	protected $legend;
+
 	/**
 	 * Construction.
 	 *
-	 * @param null  $header
+	 * @param null $legend
 	 * @param int   $checked
 	 * @param null  $name
 	 * @param array $attributes
 	 */
-	public function __construct( $header = null, $checked = 0, $name = null, $attributes = array() ) {
-		$this->items[ $name ] = $header;
-
+	public function __construct( $legend = null, $checked = 0, $name = null, $attributes = array() ) {
 		/* TODO Must change value and name to hold aan array of items.*/
+		$properties['legend'] = $legend;
 		$properties['value'] = $checked;
 		$properties['name']  = $name;
 
@@ -117,28 +118,28 @@ class Check_Box extends Input_Component {
 	 * @param null $config
 	 */
 	public function create_content( $config = null ) {
-		foreach ( $this->items as $value => $item ) {
-			$input_attr          = $this->input_attributes;
-			$input_attr['name']  = $value;
-			$input_attr['value'] = '1';
-
-			if ( 1 === $this->value ) {
-				$input_attr['checked'] = 'checked';
-			}
-
-			$input = new Input_Checkbox( $input_attr );
-
-			$span   = new Span( $this->label );
-			$legend = new Legend( $span, array( 'class' => 'screen-reader-text' ) );
-
-			$fieldset = new Fieldset( $legend );
-
-			$label = new Label( $input, array( 'for' => $value ) );
-			$label->add_content( $item );
-
-			$fieldset->add_content( $label );
-
-			$this->add_content( $fieldset );
+		$input_attr = $this->input_attributes;
+		$input_attr['name'] = $this->id;
+		$input_attr['value'] = '1';
+		if ( 1 === $this->value ) {
+			$input_attr['checked'] = 'checked';
 		}
+
+		$input = new Input_Checkbox( $input_attr );
+
+		$span = new Span( $this->label );
+		$legend = new Legend( $span, array( 'class' => 'screen-reader-text' ) );
+
+		$fieldset = new Fieldset( $legend );
+
+		$label = new Label( $input, array( 'for' => $this->value ) );
+		if ( $this->legend ) {
+			$label->add_content( $this->legend );
+		}
+
+		$fieldset->add_content( $label );
+
+		$this->add_content( $fieldset );
 	}
 }
+
