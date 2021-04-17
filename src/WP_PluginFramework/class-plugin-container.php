@@ -359,7 +359,7 @@ class Plugin_Container {
 	}
 
 	public static function uninstall_plugin() {
-		$path = plugin_dir_path( self::$plugin_base_file_path ) . 'models';
+		$path = plugin_dir_path( self::$plugin_base_file_path ) . 'src/models';
 
 		if ( is_dir( $path ) ) {
 			$filenames = scandir( $path );
@@ -390,7 +390,7 @@ class Plugin_Container {
 
 		Debug_Logger::write_debug_note( 'Install ' . $plugin_slug . ' version ' . $plugin_version_name . '.' );
 
-		$path = plugin_dir_path( self::$plugin_base_file_path ) . 'models';
+		$path = plugin_dir_path( self::$plugin_base_file_path ) . 'src/models';
 
 		if ( is_dir( $path ) ) {
 			$filenames = scandir( $path );
