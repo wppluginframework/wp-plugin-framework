@@ -38,7 +38,7 @@ use WP_PluginFramework\Models\Version_Info;
  */
 class Plugin_Container {
 
-	const WP_PLUGIN_MVC_FRAMEWORK_VERSION  = '0.0.3.1';
+	const WP_PLUGIN_MVC_FRAMEWORK_VERSION  = '0.0.3.2';
 	const WP_PLUGIN_FRAMEWORK_AJAX_HANDLER = 'wp_plugin_framework_ajax_handler';
 	const WP_PLUGIN_FRAMEWORK_INIT_KEY     = '_init_callback';
 
