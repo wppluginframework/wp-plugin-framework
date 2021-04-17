@@ -45,4 +45,13 @@ class Std_Option_Controller extends Std_Controller
         parent::__construct($model_class, $view_class, $id);
     }
 
+    protected function load_model_values( $values = array() ) {
+        if ( isset( $this->model ) ) {
+            if ( $this->model->load_data() === 1 ) {
+                $values = $this->model->get_data_object_record();
+            }
+        }
+
+        return $values;
+    }
 }

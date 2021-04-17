@@ -24,6 +24,7 @@
 
 namespace WP_PluginFramework\HtmlComponents;
 
+use WP_PluginFramework\DataTypes\Data_Type;
 use WP_PluginFramework\HtmlElements\Label;
 use WP_PluginFramework\HtmlElements\Tr;
 use WP_PluginFramework\HtmlElements\Th;
@@ -88,6 +89,9 @@ class Input_Component extends Html_Base_Component {
 	 * @param $value
 	 */
 	public function set_value( $value ) {
+        if ( $value instanceof Data_Type ) {
+            $value = $value->get_value_type( static::DEFAULT_VALUE_TYPE );
+        }
 		if ( gettype( $value ) === static::DEFAULT_VALUE_TYPE ) {
 			$this->value = $value;
 		} else {

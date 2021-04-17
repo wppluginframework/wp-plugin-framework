@@ -183,6 +183,46 @@ class Data_Type extends Content_Object {
 		return $this->value;
 	}
 
+    public function get_value_type($type) {
+        $converted_value = null;
+        switch(gettype($this->value)) {
+            case 'integer':
+                switch($type) {
+                    case 'integer':
+                        $converted_value = $this->value;
+                        break;
+                    case 'string':
+                        $converted_value = $this->get_string();
+                        break;
+
+                    default:
+                        Debug_Logger::write_debug_error( 'Missing data type conversion.', gettype($this->value), $type );
+                        break;
+                }
+                break;
+
+            case 'string':
+                switch($type) {
+                    case 'integer':
+                        $converted_value = intval($this->value);
+                        break;
+                    case 'string':
+                        $converted_value = $this->value;
+                        break;
+
+                    default:
+                        Debug_Logger::write_debug_error( 'Missing data type conversion.', gettype($this->value), $type );
+                        break;
+                }
+                break;
+
+            default:
+                Debug_Logger::write_debug_error( 'Missing data type conversion.', gettype($this->value), $type );
+                break;
+        }
+        return $converted_value;
+    }
+
     public function get_label() {
         return $this->label;
     }

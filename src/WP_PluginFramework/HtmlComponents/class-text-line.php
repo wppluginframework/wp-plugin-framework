@@ -26,6 +26,7 @@ namespace WP_PluginFramework\HtmlComponents;
 
 defined( 'ABSPATH' ) || exit;
 
+use WP_PluginFramework\DataTypes\Data_Type;
 use WP_PluginFramework\HtmlElements\Input_Text;
 
 /**
@@ -63,19 +64,6 @@ class Text_Line extends Input_Component {
 		);
 
 		parent::__construct( $attributes, $properties );
-	}
-
-	/**
-	 * Summary.
-	 *
-	 * @param $value
-	 */
-	public function set_value( $value ) {
-		parent::set_property( 'value', $value );
-	}
-
-	public function get_value() {
-		return parent::get_property( 'value' );
 	}
 
 	public function set_text( $text ) {
