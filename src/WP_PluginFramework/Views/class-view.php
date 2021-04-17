@@ -225,7 +225,7 @@ abstract class View extends Html_Base_Element {
 		}
 
 		foreach ( $this->components as $id => $component ) {
-			$value = $component->pick_client_side_value($client_side_values);;
+			$value = $component->pick_client_side_value($client_side_values);
 			if( isset( $value)) {
 				$values[ $id ] = $value;
 			}

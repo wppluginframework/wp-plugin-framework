@@ -67,7 +67,6 @@ class Number_Box extends Input_Component {
 
 	public function set_value( $value ) {
 		parent::set_property( 'value', $value );
-		$this->touched['value'] = true;
 	}
 
 	public function get_value() {
