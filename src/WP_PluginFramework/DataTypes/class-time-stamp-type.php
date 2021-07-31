@@ -43,7 +43,7 @@ class Time_Stamp_Type extends Data_Type {
 		}
 
 		if ( isset( $metadata['default_value'] ) ) {
-			switch ( $metadata['default_value'] ) {
+			switch ( gettype( $metadata['default_value'] ) ) {
 				case 'integer':
 					if ( $this->default_value >= 0 ) {
 						$metadata['default_value'] = date( 'Y-m-d H:i:s', $this->default_value );
