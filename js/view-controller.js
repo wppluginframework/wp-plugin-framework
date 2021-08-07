@@ -1,16 +1,18 @@
 jQuery(document).ready(function($)
 {
-    function wp_plugin_framework_read_form_inputs(my_object, form_selector){
+    function wp_plugin_framework_get_form(my_object, form_selector){
         var form;
         if(form_selector === ''){
             form = $(my_object).closest('form');
         }else {
             form = $(form_selector);
         }
+        return form;
+    }
 
+    function wp_plugin_framework_read_form_inputs(form, input_selector){
         var data = {};
 
-        var input_selector = wp_plugin_framework_script_vars.form_input_selector;
         var input_list = $(form).find(input_selector);
 
         for(var i=0; i<input_list.length; i++) {
@@ -60,13 +62,22 @@ jQuery(document).ready(function($)
     }
 
     function wp_plugin_framework_call_ajax(my_object, action, controller, view, wpnonce, event_type, event, arguments, form_selector, context_data) {
-        var data = wp_plugin_framework_read_form_inputs(my_object, form_selector);
+        var form = wp_plugin_framework_get_form(my_object, form_selector);
+        var id = $(form).attr('id');
+        var script_variable = 'wp_plugin_framework_script_vars_' +  id;
+        var input_selector = window[script_variable].form_input_selector;
+        var data = wp_plugin_framework_read_form_inputs(form, input_selector);
+        if(!action) {
+            action = window[script_variable].wp_ajax_function;
+        }
         data['action'] = action;
         data['_event_type'] = event_type;
         data['_event'] = event;
         data['_arguments'] = arguments;
+        if(!context_data) {
+            context_data = window[script_variable].context_data;
+        }
         data['_context_data'] = context_data;
-
         if(controller){
             data['_controller'] = controller;
         }
@@ -77,7 +88,9 @@ jQuery(document).ready(function($)
             data['_wpnonce'] = wpnonce;
         }
 
-        var jqXHR = $.post(wp_plugin_framework_script_vars.url_to_my_site, data, function (resp, status) {
+        var url_to_my_site = window[script_variable].url_to_my_site;
+
+        var jqXHR = $.post(url_to_my_site, data, function (resp, status) {
             if(status === "success") {
                 if(resp != null) {
                     if (resp.result === "ok") {
@@ -163,11 +176,11 @@ jQuery(document).ready(function($)
 
     function wp_plugin_framework_get_data(my_object, event){
         var form_selector = '';
-        var action = wp_plugin_framework_script_vars.wp_ajax_function;
+        var action = null;
         var controller = null;
         var view = null;
         var wpnonce = null;
-        var context_data = wp_plugin_framework_script_vars.context_data;
+        var context_data = null;
         var event_type = 'click';
         var arguments = null;
 

@@ -881,7 +881,8 @@ abstract class Controller {
 			'wp_ajax_function'    => Plugin_Container::WP_PLUGIN_FRAMEWORK_AJAX_HANDLER,
 			'context_data'        => $this->client_context_data,
 		);
-		wp_localize_script( $script_handler, 'wp_plugin_framework_script_vars', $data_array );
+		$var_obj_name = 'wp_plugin_framework_script_vars_' . $this->id;
+		wp_localize_script( $script_handler, $var_obj_name, $data_array );
 
 		$style_handler1 = $unique_prefix . '_style_handler';
 		$style_url      = plugin_dir_url( __FILE__ ) . '../../../css/style.css';
