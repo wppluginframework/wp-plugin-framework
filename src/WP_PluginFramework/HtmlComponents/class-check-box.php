@@ -119,7 +119,7 @@ class Check_Box extends Input_Component {
 	 */
 	public function create_content( $config = null ) {
 		$input_attr = $this->input_attributes;
-		$input_attr['name'] = $this->id;
+		$input_attr['name'] = $this->name;
 		$input_attr['value'] = '1';
 		if ( 1 === $this->value ) {
 			$input_attr['checked'] = 'checked';
