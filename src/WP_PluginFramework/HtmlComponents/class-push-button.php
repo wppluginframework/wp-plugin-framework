@@ -149,11 +149,6 @@ class Push_Button extends Html_Base_Component {
             $this->add_class( 'button' );
         }
 
-        $button = new Button( $this->label, $this->attributes );
-        $this->add_content( $button );
-
-        return;
-
 		if ( ! isset( $config ) ) {
 			/* If no config, draw a stand-alone button with wrapped in a form */
 			if ( $this->add_parents_hidden_field ) {
@@ -163,25 +158,25 @@ class Push_Button extends Html_Base_Component {
 				}
 			}
 
-			$attributes = array();
+			$form_attributes = array();
 			switch ( $this->method ) {
 				case Form_View::SEND_METHOD_AJAX:
 					break;
 
 				case Form_View::SEND_METHOD_POST:
-					$attributes['method'] = 'post';
+					$form_attributes['method'] = 'post';
 					$this->add_hidden_fields( 'action', Plugin_Container::WP_PLUGIN_FRAMEWORK_AJAX_HANDLER );
 					$this->add_hidden_fields( '_event_type', 'click' );
 					break;
 
 				case Form_View::SEND_METHOD_GET:
-					$attributes['method'] = 'get';
+					$form_attributes['method'] = 'get';
 					$this->add_hidden_fields( 'action', Plugin_Container::WP_PLUGIN_FRAMEWORK_AJAX_HANDLER );
 					$this->add_hidden_fields( '_event_type', 'click' );
 					break;
 			}
 
-			$form = new Form( null, $attributes );
+			$form = new Form( null, $form_attributes );
 
 			foreach ( $this->hidden_fields as $hidden_field_attributes ) {
 				$hidden_input = new Input_Hidden( $hidden_field_attributes );
