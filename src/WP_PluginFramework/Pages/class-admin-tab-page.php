@@ -28,7 +28,6 @@ defined( 'ABSPATH' ) || exit;
 
 use WP_PluginFramework\HtmlComponents\Status_Bar;
 use WP_PluginFramework\HtmlElements\H;
-use WP_PluginFramework\Pages\Admin_Page;
 use WP_PluginFramework\HtmlComponents\Nav_Tab_Menu;
 
 /**
