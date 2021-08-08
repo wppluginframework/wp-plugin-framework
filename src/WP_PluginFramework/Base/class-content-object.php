@@ -100,6 +100,31 @@ class Content_Object extends Base_Object {
         }
     }
 
+	public function insert_content( $content, $index ) {
+		switch ( gettype( $content ) ) {
+			case 'array':
+				$existing_length = count($this->contents);
+				if($index < $existing_length) {
+					$post_items = array_splice($this->contents, $index-1, -1);
+					$this->contents = array_merge( $this->contents, $content );
+					$this->contents = array_merge( $this->contents, $post_items );
+				} else {
+					Debug_Logger::write_debug_error('Index out of range.', $index, count($this->contents));
+				}
+				break;
+
+			default:
+				$existing_length = count($this->contents);
+				if($index < $existing_length) {
+					$post_items = array_splice($this->contents, $index);
+					array_push( $this->contents, $content );
+					$this->contents = array_merge( $this->contents, $post_items );
+				} else {
+					Debug_Logger::write_debug_error('Index out of range.', $index, count($this->contents));
+				}
+		}
+	}
+
     /**
      * Summary.
      *
