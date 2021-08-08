@@ -875,10 +875,15 @@ abstract class Controller {
 		$ajax_handler   = '/wp-admin/admin-ajax.php';
 		$url_to_my_site = site_url() . $ajax_handler;
 
-		$data_array = array(
+		$common_data_array = array(
 			'url_to_my_site'      => $url_to_my_site,
 			'form_input_selector' => 'input, textarea, select',
 			'wp_ajax_function'    => Plugin_Container::WP_PLUGIN_FRAMEWORK_AJAX_HANDLER,
+		);
+		$var_obj_name_common = 'wp_plugin_framework_script_vars';
+		wp_localize_script( $script_handler, $var_obj_name_common, $common_data_array );
+
+		$data_array = array(
 			'context_data'        => $this->client_context_data,
 		);
 		$var_obj_name = 'wp_plugin_framework_script_vars_' . $this->id;

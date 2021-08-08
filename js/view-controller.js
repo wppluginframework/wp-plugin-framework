@@ -65,17 +65,19 @@ jQuery(document).ready(function($)
         var form = wp_plugin_framework_get_form(my_object, form_selector);
         var id = $(form).attr('id');
         var script_variable = 'wp_plugin_framework_script_vars_' +  id;
-        var input_selector = window[script_variable].form_input_selector;
+        var input_selector = wp_plugin_framework_script_vars.form_input_selector;
         var data = wp_plugin_framework_read_form_inputs(form, input_selector);
         if(!action) {
-            action = window[script_variable].wp_ajax_function;
+            action = wp_plugin_framework_script_vars.wp_ajax_function;
         }
         data['action'] = action;
         data['_event_type'] = event_type;
         data['_event'] = event;
         data['_arguments'] = arguments;
         if(!context_data) {
-            context_data = window[script_variable].context_data;
+            if(window[script_variable]) {
+                context_data = window[script_variable].context_data;
+            }
         }
         data['_context_data'] = context_data;
         if(controller){
@@ -88,7 +90,7 @@ jQuery(document).ready(function($)
             data['_wpnonce'] = wpnonce;
         }
 
-        var url_to_my_site = window[script_variable].url_to_my_site;
+        var url_to_my_site = wp_plugin_framework_script_vars.url_to_my_site;
 
         var jqXHR = $.post(url_to_my_site, data, function (resp, status) {
             if(status === "success") {
