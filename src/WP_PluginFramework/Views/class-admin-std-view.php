@@ -45,6 +45,7 @@ class Admin_Std_View extends Std_View {
 	 */
 	public function __construct( $id, $controller, $model=null ) {
 
+		$this->admin_view = true;
         $this->content_config['form_input_layout']           = 'double_column_table';
         $this->content_config['form_placeholder_table_attr'] = array( 'class' => 'form-table' );
         $this->content_config['form_placeholder_tr_attr']    = null;

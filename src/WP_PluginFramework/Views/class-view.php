@@ -44,6 +44,7 @@ abstract class View extends Html_Base_Element {
 	protected $components     = array();
 	protected $call_backs     = array();
 	protected $div_wrapper    = null;
+	protected $admin_view     = false;
 
 	/**
 	 * Construction.
@@ -67,7 +68,7 @@ abstract class View extends Html_Base_Element {
         $this->id = $id;
 		$this->controller = $controller;
 
-        if(is_admin()) {
+        if($this->admin_view) {
             $this->div_wrapper = array('class' => 'wpf-controller wpf-controller-admin-style');
         } else {
             $this->div_wrapper = array('class' => 'wpf-controller wpf-controller-style');
