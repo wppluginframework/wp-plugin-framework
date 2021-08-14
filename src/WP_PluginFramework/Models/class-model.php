@@ -356,7 +356,7 @@ abstract class Model extends Base_Object {
 	 * @param $errors
 	 */
 	public function add_validate_error( $key, $errors ) {
-		$this->set_property_key_values( 'ValidationErrors', $key, $errors );
+		$this->set_property_key_values( 'validation_errors', $key, $errors );
 	}
 
 	/**
@@ -368,9 +368,9 @@ abstract class Model extends Base_Object {
 	 */
 	public function get_validate_errors( $key = null ) {
 		if ( isset( $key ) ) {
-			return $this->get_property_key_values( 'ValidationErrors', $key );
+			return $this->get_property_key_values( 'validation_errors', $key );
 		} else {
-			return $this->get_property( 'ValidationErrors' );
+			return $this->get_property( 'validation_errors' );
 		}
 	}
 

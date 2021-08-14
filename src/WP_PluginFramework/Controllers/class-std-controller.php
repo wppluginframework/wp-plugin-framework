@@ -84,7 +84,7 @@ class Std_Controller extends Form_Controller {
 			foreach ( $errors as $key => $error ) {
 				$component = $this->view->get_form_input_component( $key );
 				if ( $component ) {
-					$component->AddInputClass( 'wpf-input-error' );
+					$component->add_input_class( 'wpf-input-error' );
 
 					$i = array_search( $component, $ok_components );
 					if ( false !== $i ) {
