@@ -47,6 +47,7 @@ class Push_Button extends Html_Base_Component {
 	protected $label         = null;
 	protected $primary       = false;
 	protected $hidden_fields = array();
+	protected $stand_alone   = false;
 
 	private $add_parents_hidden_field = true;
 	private $event_type = null;
@@ -149,7 +150,7 @@ class Push_Button extends Html_Base_Component {
             $this->add_class( 'button' );
         }
 
-		if ( ! isset( $config ) ) {
+		if ( $this->stand_alone ) {
 			/* If no config, draw a stand-alone button with wrapped in a form */
 			if ( $this->add_parents_hidden_field ) {
 				$hidden_fields = $this->parent_view->get_property( 'hidden_fields' );
