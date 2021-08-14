@@ -130,13 +130,19 @@ class Base_Object {
 		}
 	}
 
-    public function set_property_key_value( $property, $key, $value) {
-        if ( isset( $this->$property ) ) {
-            if ( is_array( $this->$property ) ) {
-                $this->$property[ $key ] = $value;
-            }
-        }
-    }
+	public function set_property_key_value( $property, $key, $value) {
+		if ( isset( $this->$property ) ) {
+			if ( is_array( $this->$property ) ) {
+				if(array_key_exists($key, $this->$property)) {
+					$this->$property[ $key ] = $value;
+				}else {
+					/* TODO: Rewrite this. Could not change property array due to PHP 5.6 compatibility. */
+					$value_arr = array($key => $value);
+					$this->$property = array_merge ($this->$property, $value_arr);
+				}
+			}
+		}
+	}
 
 	/**
 	 * Add values to an property array given with key.
