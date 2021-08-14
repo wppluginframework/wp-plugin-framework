@@ -92,8 +92,6 @@ class Std_View extends Form_View {
             $this->content_config['form_placeholder_td_attr']   = array( 'class' => 'wpf-table-placeholder-input' );
         }
 
-        $this->std_status_bar = new Status_Bar(Status_Bar::TYPE_REMOVABLE_BLOCK);
-
         parent::__construct( $id, $controller );
 	}
 
@@ -124,18 +122,26 @@ class Std_View extends Form_View {
 		array_push($this->form_inputs, $form_input);
 	}
 
-	public function get_form_input_component( $name = null ) {
-		if ( ! isset( $name ) ) {
-			return $this->form_inputs;
-		} else {
-			foreach ( $this->form_inputs as $form_input ) {
-				if ( $name === $form_input->get_property( 'name' ) ) {
-					return $form_input;
+	public function get_form_input_components() {
+		$form_input_components = array();
+		$components = $this->get_html_components();
+		foreach ($components as $id => $component)  {
+			if (is_object($component)) {
+				if ($component instanceof Input_Component) {
+					$form_input_components[$id] = $component;
 				}
 			}
 		}
+		return $form_input_components;
+	}
 
-		return null;
+	public function get_form_input_component( $id = null ) {
+		$form_input_component = null;
+		$form_input_components = $this->get_form_input_components();
+		if(isset($form_input_components[$id])) {
+			$form_input_component = $form_input_components[$id];
+		}
+		return $form_input_component;
 	}
 
 	public function add_input_form_category( $category ) {
@@ -240,16 +246,20 @@ class Std_View extends Form_View {
 		}
 	}
 
-	public function create_input_form_content( $form_input, $content_config ){
-        $name = $form_input['component']->get_id();
-        $td_label = new Th(null, array(
-            'class' => 'wpf-table-placeholder-input row',
-        ));
-        if ( isset( $form_input['label'])) {
-            $label = new Label($form_input['label'], array('for' => $name));
-            $td_label->add_content( $label );
-        }
+	public function create_input_label( $form_input, $content_config ){
+		$name = $form_input['component']->get_id();
+		$td_label = new Th(null, array(
+			'class' => 'wpf-table-placeholder-input row',
+		));
+		if ( isset( $form_input['label'])) {
+			$label = new Label($form_input['label'], array('for' => $name, 'class' => 'wpf-label'));
+			$td_label->add_content( $label );
+		}
+		$tr = new Tr($td_label);
+		return $tr;
+	}
 
+	public function create_input_form_content( $form_input, $content_config ){
         $td_input = new Td(null, array('class' => 'wpf-table-placeholder-input'));
         if ( isset( $form_input['component'] ) ) {
             $td_input->add_content( $form_input['component'], $content_config );
@@ -258,9 +268,7 @@ class Std_View extends Form_View {
             $p = new P($form_input['description'], array('class' => 'wpf-table-input-description'));
             $td_input->add_content( $p );
         }
-
-        $tr = new Tr($td_label);
-        $tr->add_content($td_input);
+        $tr = new Tr($td_input);
         return $tr;
     }
 
@@ -269,9 +277,9 @@ class Std_View extends Form_View {
 			foreach ( $this->headers as $header ) {
 				if ( is_string( $header ) ) {
 					$header = new H( 1, $header );
-					$this->add_content( $header );
+					$this->add_pre_form_content( $header );
 				} elseif ( is_object( $header ) ) {
-					$this->add_content( $header, $this->content_config );
+					$this->add_pre_form_content( $header, $this->content_config );
 				} else {
 					Debug_Logger::write_debug_error( 'Unhandled component type ' . gettype( $header ) );
 				}
@@ -314,6 +322,8 @@ class Std_View extends Form_View {
             if ( empty( $this->input_form_categories ) ) {
                 $tbody = new TBody( null, $this->content_config['form_placeholder_tbody_attr'] );
                 foreach ( $this->form_inputs as $form_input ) {
+					$tr = $this->create_input_label( $form_input, $this->content_config );
+					$tbody->add_content($tr);
                     $tr = $this->create_input_form_content( $form_input, $this->content_config );
                     $tbody->add_content($tr);
                 }
@@ -354,7 +364,9 @@ class Std_View extends Form_View {
                     $tbody = new Tbody( null, $this->content_config['form_placeholder_tbody_attr'] );
                     foreach ( $this->form_inputs as $form_input ) {
                         if ( isset( $form_input['category'] ) && ( $form_input['category'] === $category['name'] ) ) {
-                            $tr = $this->create_input_form_content( $form_input, $this->content_config );
+							$tr = $this->create_input_label( $form_input, $this->content_config );
+							$tbody->add_content($tr);
+							$tr = $this->create_input_form_content( $form_input, $this->content_config );
                             $tbody->add_content($tr);
                         }
                     }
@@ -386,10 +398,10 @@ class Std_View extends Form_View {
 			foreach ( $this->footers as $footer ) {
 				if ( is_string( $footer ) ) {
 					$footer = new P( $footer );
-					$this->add_content( $footer );
+					$this->add_post_form_content( $footer );
 				} elseif ( is_object( $footer ) ) {
 					$footer->create_content( $this->content_config );
-					$this->add_content( $footer );
+					$this->add_post_form_content( $footer );
 				} else {
 					Debug_Logger::write_debug_error( 'Unhandled component type ' . gettype( $footer ) );
 				}

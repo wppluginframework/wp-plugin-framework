@@ -125,14 +125,14 @@ class Form_View extends View {
             $form->add_content( $this->contents );
 
 			$this->set_content( $form );
+		}
 
-			if(!empty($this->pre_form_contents)) {
-                $this->prepend_content( $this->pre_form_contents );
-            }
+		if(!empty($this->pre_form_contents)) {
+			$this->prepend_content( $this->pre_form_contents );
+		}
 
-            if(!empty($this->post_form_contents)) {
-                $this->add_content( $this->post_form_contents );
-            }
+		if(!empty($this->post_form_contents)) {
+			$this->add_content( $this->post_form_contents );
 		}
 
 		parent::create_content( $parameters );

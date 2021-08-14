@@ -79,7 +79,7 @@ class Std_Controller extends Form_Controller {
 			$invalid_errors      = array();
 			$other_error_message = array();
 
-			$ok_components = $this->view->get_form_input_component();
+			$ok_components = $this->view->get_form_input_components();
 
 			foreach ( $errors as $key => $error ) {
 				$component = $this->view->get_form_input_component( $key );
