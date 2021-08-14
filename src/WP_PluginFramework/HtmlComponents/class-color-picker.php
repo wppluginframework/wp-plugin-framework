@@ -100,8 +100,6 @@ class Color_Picker extends Input_Component {
 	 * @param null $config
 	 */
 	public function create_content( $config = null ) {
-		$wrapper = parent::create_content( $config );
-
 		$input_attr          = $this->input_attributes;
 		$input_attr['name']  = $this->name;
 		$input_attr['value'] = $this->value;
@@ -124,11 +122,6 @@ class Color_Picker extends Input_Component {
 		$color_picker = new Div( $input, $div_color_picker_attr );
 		$color_picker->add_content( $color_show );
 
-		$wrapper->add_content( $color_picker );
-
-		if ( isset( $this->description ) ) {
-			$description = new P( $this->description, array( 'class' => 'description' ) );
-			$wrapper->add_content( $description );
-		}
+		$this->add_content( $color_picker );
 	}
 }
