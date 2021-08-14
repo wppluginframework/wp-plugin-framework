@@ -26,6 +26,8 @@ namespace WP_PluginFramework;
 
 defined( 'ABSPATH' ) || exit;
 
+include_once('Utils/polyfills.php');
+
 use WP_PluginFramework\Controllers\Controller;
 use WP_PluginFramework\Utils\Security_Filter;
 use WP_PluginFramework\Utils\Debug_Logger;
