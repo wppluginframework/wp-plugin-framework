@@ -38,8 +38,6 @@ class Text_Line extends Input_Component {
 
 	const DEFAULT_VALUE_TYPE = 'string';
 
-	protected $input_attributes = array();
-
 	/**
 	 * Construction.
 	 *
