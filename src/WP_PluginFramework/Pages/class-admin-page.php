@@ -50,7 +50,9 @@ class Admin_Page extends Page {
         $this->prepend_content($h);
 
         foreach($this->contents as $content) {
-        	$content->set_property('admin_view', true);
+			if($content->has_property('admin_view')) {
+				$content->set_property( 'admin_view', true );
+			}
 		}
 
         parent::create_content();

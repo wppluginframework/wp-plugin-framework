@@ -82,7 +82,15 @@ class Base_Object {
 			$this->$property = $value;
 			return true;
 		} else {
-			Debug_Logger::write_debug_error('Properties does not exist.', $properry, $value);
+			Debug_Logger::write_debug_error('Properties does not exist.', $property, $value);
+			return false;
+		}
+	}
+
+	public function has_property( $property ) {
+		if(property_exists($this, $property)) {
+			return true;
+		} else {
 			return false;
 		}
 	}
@@ -95,20 +103,43 @@ class Base_Object {
 	 *
 	 * @return bool|null
 	 */
-	public function add_property( $property, $values ) {
-		if ( isset( $this->$property ) ) {
+	public function add_property( $property, $value ) {
+		if ( ! property_exists( $this, $property ) ) {
+			if ( ! is_array( $value ) ) {
+				$this->$property = $value;
+				return true;
+			} else {
+				Debug_Logger::write_debug_error('Can not accept array property.', $property, $value);
+				return false;
+			}
+		} else {
+			Debug_Logger::write_debug_error('Properties exist.', $property, $value);
+			return false;
+		}
+	}
+
+	/**
+	 * Summary.
+	 *
+	 * @param $property
+	 * @param $values
+	 *
+	 * @return bool|null
+	 */
+	public function add_array_property_item( $property, $value ) {
+		if ( property_exists( $this, $property ) ) {
 			if ( is_array( $this->$property ) ) {
 				if ( empty( $this->$property ) ) {
-					if ( is_array( $values ) ) {
-						$this->$property = $values;
+					if ( is_array( $value ) ) {
+						$this->$property = $value;
 					} else {
-						array_push( $this->$property, $values );
+						array_push( $this->$property, $value );
 					}
 				} else {
-					if ( is_array( $values ) ) {
-						$this->$property = array_merge( $this->$property, $values );
+					if ( is_array( $value ) ) {
+						$this->$property = array_merge( $this->$property, $value );
 					} else {
-						array_push( $this->$property, $values );
+						array_push( $this->$property, $value );
 					}
 				}
 				return true;
@@ -116,7 +147,7 @@ class Base_Object {
 				return false;
 			}
 		} else {
-			return null;
+			return false;
 		}
 	}
 

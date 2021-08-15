@@ -162,7 +162,7 @@ class Data_Type extends Content_Object {
 	 * @return bool|null
 	 */
 	public function add_validate_errors( $errors ) {
-		return $this->add_property( 'ValidateErrors', $errors );
+		return $this->add_array_property_item( 'ValidateErrors', $errors );
 	}
 
 	/**
