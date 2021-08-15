@@ -26,7 +26,6 @@ namespace WP_PluginFramework\Pages;
 
 defined( 'ABSPATH' ) || exit;
 
-use WP_PluginFramework\Pages\Page;
 use WP_PluginFramework\HtmlElements\H;
 use WP_PluginFramework\Plugin_Container;
 
