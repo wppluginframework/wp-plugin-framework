@@ -46,8 +46,13 @@ class Admin_Page extends Page {
                 $headline = $plugin_name . ' - ' . $headline;
             }
         }
+
         $h = new H(1, $headline);
         $this->prepend_content($h);
+
+        foreach($this->contents as $content) {
+        	$content->set_property('admin_view', true);
+		}
 
         parent::create_content();
     }

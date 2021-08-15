@@ -26,6 +26,7 @@ namespace WP_PluginFramework\Controllers;
 
 defined( 'ABSPATH' ) || exit;
 
+use WP_PluginFramework\Base\Base_Object;
 use WP_PluginFramework\Models\Model;
 use WP_PluginFramework\Views\Form_View;
 use WP_PluginFramework\Plugin_Container;
@@ -37,7 +38,7 @@ use WP_PluginFramework\Utils\Debug_Logger;
  *
  * Description.
  */
-abstract class Controller {
+abstract class Controller extends Base_Object {
 
 	const EVENT_TYPE_NONE     = 0;
 	const EVENT_TYPE_POST     = 'post';
@@ -87,6 +88,8 @@ abstract class Controller {
 	/** @var Model */
 	protected $model         = null;
 	protected $ajax_response = array();
+
+	protected $admin_view = null;
 
 	/**
 	 * Construction.
@@ -604,7 +607,12 @@ abstract class Controller {
 		if ( $this->nonce_protected_data[ self::PROTECTED_DATA_VIEW ] ) {
 			$my_controller_name = get_called_class();
 
-			$this->view = new $this->nonce_protected_data[ self::PROTECTED_DATA_VIEW ]($this->id, $my_controller_name, $this->model);
+			$properties = array();
+			if(isset($this->admin_view)) {
+				$properties['admin_view'] = $this->admin_view;
+			}
+
+			$this->view = new $this->nonce_protected_data[ self::PROTECTED_DATA_VIEW ]($this->id, $my_controller_name, $this->model, $properties);
 
 			$view = $this->view;
 		}

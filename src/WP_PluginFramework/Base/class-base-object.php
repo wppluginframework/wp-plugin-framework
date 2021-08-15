@@ -78,8 +78,13 @@ class Base_Object {
 	 * @param $value
 	 */
 	public function set_property( $property, $value ) {
-		$this->$property = $value;
-		return true;
+		if(property_exists($this, $property)) {
+			$this->$property = $value;
+			return true;
+		} else {
+			Debug_Logger::write_debug_error('Properties does not exist.', $properry, $value);
+			return false;
+		}
 	}
 
 	/**

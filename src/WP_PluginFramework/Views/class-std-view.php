@@ -67,11 +67,17 @@ class Std_View extends Form_View {
 	 * @param $controller
 	 * @param array      $attributes
 	 */
-	public function __construct( $id, $controller, $model = null ) {
+	public function __construct( $id, $controller, $model = null, $properties = array() ) {
 
 		$this->form_id = $id;
 
-        if(is_admin()) {
+		if(array_key_exists('admin_view', $properties)) {
+			$this->admin_view = $properties['admin_view'];
+		} else {
+			$this->admin_view = is_admin();
+		}
+
+        if($this->admin_view) {
             $this->content_config['form_input_layout']           = 'double_column_table';
             $this->content_config['form_placeholder_table_attr'] = array( 'class' => 'form-table' );
             $this->content_config['form_placeholder_tbody_attr'] = array( 'class' => 'wpf-table-placeholder' );
@@ -92,7 +98,7 @@ class Std_View extends Form_View {
             $this->content_config['form_placeholder_td_attr']   = array( 'class' => 'wpf-table-placeholder-input' );
         }
 
-        parent::__construct( $id, $controller );
+        parent::__construct( $id, $controller, null, $properties );
 	}
 
 	public function add_header( $id, $component ) {
@@ -255,8 +261,7 @@ class Std_View extends Form_View {
 			$label = new Label($form_input['label'], array('for' => $name, 'class' => 'wpf-label'));
 			$td_label->add_content( $label );
 		}
-		$tr = new Tr($td_label);
-		return $tr;
+		return $td_label;
 	}
 
 	public function create_input_form_content( $form_input, $content_config ){
@@ -268,8 +273,7 @@ class Std_View extends Form_View {
             $p = new P($form_input['description'], array('class' => 'wpf-table-input-description'));
             $td_input->add_content( $p );
         }
-        $tr = new Tr($td_input);
-        return $tr;
+        return $td_input;
     }
 
 	public function create_content( $parameters = null ) {
@@ -322,10 +326,18 @@ class Std_View extends Form_View {
             if ( empty( $this->input_form_categories ) ) {
                 $tbody = new TBody( null, $this->content_config['form_placeholder_tbody_attr'] );
                 foreach ( $this->form_inputs as $form_input ) {
-					$tr = $this->create_input_label( $form_input, $this->content_config );
-					$tbody->add_content($tr);
-                    $tr = $this->create_input_form_content( $form_input, $this->content_config );
-                    $tbody->add_content($tr);
+					$td_label = $this->create_input_label( $form_input, $this->content_config );
+					$td_input = $this->create_input_form_content( $form_input, $this->content_config );
+					if($this->content_config['form_input_layout'] == 'double_column_table') {
+						$tr = new Tr($td_label);
+						$tr->add_content($td_input);
+						$tbody->add_content( $tr );
+					} else {
+						$tr = new Tr($td_label);
+						$tbody->add_content( $tr );
+						$tr = new Tr($td_input);
+						$tbody->add_content( $tr );
+					}
                 }
                 $table = new Table($tbody, $this->content_config['form_placeholder_table_attr']);
                 $td_form->add_content( $table );
@@ -364,10 +376,18 @@ class Std_View extends Form_View {
                     $tbody = new Tbody( null, $this->content_config['form_placeholder_tbody_attr'] );
                     foreach ( $this->form_inputs as $form_input ) {
                         if ( isset( $form_input['category'] ) && ( $form_input['category'] === $category['name'] ) ) {
-							$tr = $this->create_input_label( $form_input, $this->content_config );
-							$tbody->add_content($tr);
-							$tr = $this->create_input_form_content( $form_input, $this->content_config );
-                            $tbody->add_content($tr);
+							$td_label = $this->create_input_label( $form_input, $this->content_config );
+							$td_input = $this->create_input_form_content( $form_input, $this->content_config );
+							if($this->content_config['form_input_layout'] == 'double_column_table') {
+								$tr = new Tr($td_label);
+								$tr->add_content($td_input);
+								$tbody->add_content( $tr );
+							} else {
+								$tr = new Tr($td_label);
+								$tbody->add_content( $tr );
+								$tr = new Tr($td_input);
+								$tbody->add_content( $tr );
+							}
                         }
                     }
                     $table = new Table($tbody, $this->content_config['form_placeholder_table_attr']);

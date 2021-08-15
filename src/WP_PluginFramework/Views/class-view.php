@@ -53,7 +53,7 @@ abstract class View extends Html_Base_Element {
 	 * @param null       $content
 	 * @param null       $attributes
 	 */
-	public function __construct( $id, $controller, $model = null ) {
+	public function __construct( $id, $controller, $model = null, $properties = array()  ) {
         $detected_components = $this->get_html_components();
         foreach ( $detected_components as $component_id => $component )
         {
@@ -74,7 +74,7 @@ abstract class View extends Html_Base_Element {
             $this->div_wrapper = array('class' => 'wpf-controller wpf-controller-style');
         }
 
-        parent::__construct( null, null );
+        parent::__construct( null, null, null, null, $properties );
 	}
 
 	public function add_div_wrapper( $attributes ) {

@@ -32,7 +32,7 @@ class Std_Option_View extends Std_View {
     /** @var Push_Button */
     public $std_submit;
 
-    public function __construct( $id, $controller, $model )
+    public function __construct( $id, $controller, $model, $properties = array() )
     {
         foreach($model::$meta_data as $name => $meta) {
             $data_object = Data_Type::create_data_object($meta, $name);
@@ -41,7 +41,7 @@ class Std_Option_View extends Std_View {
 
         $this->std_submit = new Push_Button('Save');
 
-        parent::__construct( $id, $controller, $model );
+        parent::__construct( $id, $controller, $model, $properties );
 
         $this->std_status_bar->set_id('admin_status_bar');
     }
