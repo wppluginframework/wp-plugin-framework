@@ -42,8 +42,6 @@ class Std_Option_View extends Std_View {
         $this->std_submit = new Push_Button('Save');
 
         parent::__construct( $id, $controller, $model, $properties );
-
-        $this->std_status_bar->set_id('admin_status_bar');
     }
 
     public function create_content( $parameters = null ) {

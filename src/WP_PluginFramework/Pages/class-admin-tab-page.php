@@ -63,9 +63,9 @@ class Admin_Tab_Page extends Admin_Page {
             $this->prepend_content($headline);
         }
 
-        $this->admin_status_bar = new Status_Bar( Status_Bar::TYPE_REMOVABLE_BLOCK );
-        $this->admin_status_bar->set_id('admin_status_bar');
-        $this->prepend_content($this->admin_status_bar);
+        $this->std_status_bar = new Status_Bar( Status_Bar::TYPE_REMOVABLE_BLOCK );
+        $this->std_status_bar->set_id('std_status_bar');
+        $this->prepend_content($this->std_status_bar);
 
         if ( isset( $this->nav_tabs ) ) {
             $attributes['class'] = 'nav-tab-wrapper';

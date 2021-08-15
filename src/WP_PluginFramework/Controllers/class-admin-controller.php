@@ -47,24 +47,6 @@ class Admin_Controller extends Std_Controller {
 		$this->set_permission( true, 'manage_options' );
 	}
 
-	/**
-	 * Summary.
-	 *
-	 * @param $data_record
-	 */
-	public function handle_save_success( $data_record ) {
-		$this->view->admin_status_bar->set_status_text( 'Your settings have been saved.', Status_Bar::STATUS_SUCCESS );
-	}
-
-	/**
-	 * Summary.
-	 *
-	 * @param $data_record
-	 */
-	public function handle_save_errors( $data_record ) {
-		$this->view->admin_status_bar->set_status_text( 'Error saving data.', Status_Bar::STATUS_ERROR );
-	}
-
     /**
      * @param $input_name
      */

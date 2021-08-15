@@ -34,9 +34,6 @@ use WP_PluginFramework\Plugin_Container;
  */
 class Admin_Std_View extends Std_View {
 
-    /** @var Status_Bar */
-    public $std_status_bar;
-
 	/**
 	 * Construction.
 	 *
@@ -53,9 +50,6 @@ class Admin_Std_View extends Std_View {
         $this->content_config['form_placeholder_td_attr']    = null;
         $this->content_config['form_input_encapsulation'] = null;
         $this->content_config['form_input_width'] = '100%';
-
-        $this->admin_status_bar = new Status_Bar(Status_Bar::TYPE_REMOVABLE_BLOCK);
-
         parent::__construct( $id, $controller, $model );
 	}
 

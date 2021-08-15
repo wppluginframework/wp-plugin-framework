@@ -77,6 +77,8 @@ class Std_View extends Form_View {
 			$this->admin_view = is_admin();
 		}
 
+		$this->std_status_bar = new Status_Bar();
+
         if($this->admin_view) {
             $this->content_config['form_input_layout']           = 'double_column_table';
             $this->content_config['form_placeholder_table_attr'] = array( 'class' => 'form-table' );
@@ -86,6 +88,7 @@ class Std_View extends Form_View {
             $this->content_config['form_placeholder_td_attr']    = null;
             $this->content_config['form_input_encapsulation'] = null;
             $this->content_config['form_input_width'] = '100%';
+			$this->std_status_bar->set_property('type', Status_Bar::TYPE_REMOVABLE_BLOCK);
         }	else {
             $this->div_wrapper                                  = array( 'class' => 'wpf-controller' );
             $this->content_config['form_input_encapsulation']   = 'table';
